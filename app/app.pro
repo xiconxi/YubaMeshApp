@@ -47,7 +47,7 @@ osx {
     glviewer.files += $$OUT_PWD/../bin/GLViewer
 #    glviewer.files += $$OUT_PWD/../MeshMorph
     glviewer.files += $$OUT_PWD/../bin/Measurement
-#    glviewer.files += $$OUT_PWD/../bin/MeshDevelop
+    glviewer.files += $$OUT_PWD/../bin/MeshDevelop
     glviewer.files += $$PWD/../plugins/pluginsConfig.xml
     glviewer.path = Contents/PlugIns
     QMAKE_BUNDLE_DATA += glviewer

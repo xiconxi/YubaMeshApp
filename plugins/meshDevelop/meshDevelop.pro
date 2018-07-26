@@ -11,17 +11,12 @@ INCLUDEPATH += ../
 SOURCES += \
     ../../depends/easylog/easylogging++.cc \
     develop_plugin.cpp \
-    develop_backend.cpp \
-    algorithm/meshProcessing.cpp \
-    algorithm/half_edge.cpp
+    develop_backend.cpp
 
 HEADERS += \
     develop_plugin.h \
     develop_backend.h \
-    svpng.inc       \
-    algorithm/meshProcessing.h \
-    algorithm/half_edge.h
-
+    svpng.inc
 
 CONFIG(release, debug|release): {
     DESTDIR = ../../bin/$$TARGET
@@ -30,6 +25,7 @@ CONFIG(release, debug|release): {
     OBJECTS_DIR = ../tmp/$$TARGET
 
     LIBS +=-L$$OUT_PWD/../../bin/GLViewer -lGLViewer
+    INCLUDEPATH += ../glviewer/wrapInclude
 
 
     # Copy the qmldir file to the same folder as the plugin binary

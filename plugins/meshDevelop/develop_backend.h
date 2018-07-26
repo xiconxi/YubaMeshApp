@@ -2,7 +2,7 @@
 #define DEVELOP_BACKEND_H
 
 #include <QObject>
-#include "../glviewer/manager/RenderManager.h"
+#include <controller>
 #include <glm/vec2.hpp>
 
 class develop_backend;
@@ -13,9 +13,9 @@ public:
     glm::vec2 dot_v;
 private:
     float percent = 0;
-    void scan_line_animation(RenderScript *f);
+    void scan_line_animation(QTime& t);
 
-    void draw_model(RenderScript *f);
+    void draw_model(QTime &t);
 
     friend class develop_backend;
 };
@@ -26,11 +26,10 @@ class develop_backend:public QObject
 public:
     develop_backend(QObject* parent=nullptr);
 
-    Q_INVOKABLE void glinit();
-
     Q_INVOKABLE void draw_for(QString value);
+
+    Q_INVOKABLE void instance();
 private:
-    void initial_gl_resource();
     A* render_a = nullptr;
 };
 

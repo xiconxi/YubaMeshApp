@@ -9,10 +9,6 @@ Item {
         text: "meshDevelop"
     }
 
-    Component.onCompleted: {
-        SubBackends.glinit()
-    }
-
     Column{
         anchors.horizontalCenter: parent.horizontalCenter
         y: 100

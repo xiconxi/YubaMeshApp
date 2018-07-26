@@ -47,17 +47,22 @@ YubaWindow {
                 query: "/channel/plugin"
                 XmlRole { name: "name"; query: "name/string()" }
                 XmlRole { name: "module"; query: "module/string()" }
+                XmlRole { name: "version"; query: "version/string()" }
 
                 onStatusChanged: {
-                    if(status== XmlListModel.Ready){
-                        toolCategoryList.currentIndex = count -1
-                    }
+//                    by using this, will open the last menu(currentIndex will change twice!!!!!)
+//                    if(status== XmlListModel.Ready){
+//                        toolCategoryList.currentIndex = count -1
+//                    }
                 }
             }
             onCurrentIndexChanged:{
                 if( leftToolView.subView)
                     leftToolView.subView.destroy();
-                var plugin_str ='import QtQuick 2.0; \nimport '+menuXmlModel.get(currentIndex).module+'; \n'+'Tools{anchors.fill :parent}';
+                glViewer.registerModule(menuXmlModel.get(currentIndex).module)
+                var plugin_str ='import QtQuick 2.0; \nimport '+menuXmlModel.get(currentIndex).module + ' ' +
+                                menuXmlModel.get(currentIndex).version+'; \n'+'Tools{anchors.fill :parent\n'+
+                                'Component.onCompleted: SubBackends.instance()\n}';
                 leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
             }
 
