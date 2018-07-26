@@ -1,0 +1,7 @@
+*.user
+.idea/
+cmake-build-*
+*.obj
+*.off
+*.cie
+./trash

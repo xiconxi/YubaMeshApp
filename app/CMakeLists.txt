@@ -1,0 +1,7 @@
+set(CMAKE_INCLUDE_CURRENT_DIR  ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(YubaApp main.cpp gl4window.cpp gl4window.h  qml/qml.qrc)
+SET_TARGET_PROPERTIES(YubaApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ../)
+target_link_libraries(YubaApp Qt5::Core Qt5::Quick)

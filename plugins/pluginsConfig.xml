@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<channel>
+    <plugin>
+        <name>测量</name>
+        <module>Measurement 1.0</module>
+    </plugin>
+<!--    <plugin>
+        <name>变形</name>
+        <module>MeshMorph 1.0</module>
+    </plugin>-->
+<!--    <plugin>
+        <name>develop</name>
+        <module>MeshDevelop 1.0</module>
+    </plugin>-->
+</channel>
