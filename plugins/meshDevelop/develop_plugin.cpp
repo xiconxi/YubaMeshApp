@@ -2,12 +2,8 @@
 #include "develop_backend.h"
 
 #include <qqml.h>
-
 #include <controller>
 #include <mesh_proc>
-
-#include "algorithm/meshProcessing.h"
-
 
 static QObject *subBackendFunc(QQmlEngine *pQMLEngine,QJSEngine *pJSEngine) {
     Q_UNUSED(pQMLEngine);

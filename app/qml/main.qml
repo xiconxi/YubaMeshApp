@@ -59,10 +59,14 @@ YubaWindow {
             onCurrentIndexChanged:{
                 if( leftToolView.subView)
                     leftToolView.subView.destroy();
-                glViewer.registerModule(menuXmlModel.get(currentIndex).module)
-                var plugin_str ='import QtQuick 2.0; \nimport '+menuXmlModel.get(currentIndex).module + ' ' +
-                                menuXmlModel.get(currentIndex).version+'; \n'+'Tools{anchors.fill :parent\n'+
-                                'Component.onCompleted: SubBackends.instance()\n}';
+                var M = menuXmlModel.get(currentIndex)
+                glViewer.registerModule(M.module)
+
+                var plugin_str ='import QtQuick 2.0; \nimport '+M.module + ' ' +
+                                M.version+'; \n'+'Tools{anchors.fill :parent\n'+
+                                'Component.onCompleted: SubBackends.construction()\n' +
+                                "Component.onDestruction: {glViewer.unregisterModule('"+M.module+"')\n"+
+                                "SubBackends.destruction()}}";
                 leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
             }
 

@@ -2,11 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QStandardPaths>
-#include <easylog/easylogging++.h>
 #include "gl4window.h"
 #include <QProcess>
-
-//INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[])
 {    

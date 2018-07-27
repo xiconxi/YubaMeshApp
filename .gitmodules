@@ -1,0 +1,6 @@
+[submodule "depends/EIGEN"]
+	path = depends/EIGEN
+	url = https://github.com/PX4/eigen
+[submodule "depends/easyloggingpp"]
+	path = depends/easyloggingpp
+	url = https://github.com/muflihun/easyloggingpp

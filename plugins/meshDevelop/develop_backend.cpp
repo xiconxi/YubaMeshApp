@@ -1,6 +1,6 @@
 #include "develop_backend.h"
 #include <functional>
-#include <easylog/easylogging++.h>
+#include <easylogging++.h>
 #include <controller>
 #include <mesh_proc>
 
@@ -8,13 +8,12 @@
 #include <fstream>
 // OPENCV
 
-INITIALIZE_EASYLOGGINGPP
 develop_backend::develop_backend(QObject* parent)
     : QObject(parent)
 {
 }
 
-void develop_backend::instance() {
+void develop_backend::construction() {
 #if defined(Q_OS_OSX)
     QString prefix = "../PlugIns/MeshDevelop/shaders/";
 #elif defined(Q_OS_WIN)
@@ -23,16 +22,12 @@ void develop_backend::instance() {
     RenderScript([=](QTime &t) mutable {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
-        PickableMesh* mesh = readObj("../PlugIns/GLViewer/mesh/body_sample.obj");
-        calculateNorm(mesh);
-        centerlized(mesh);
-        sortByVector(mesh, glm::normalize(glm::mat3(glm::inverse(mesh->model))*glm::vec3(0,1,0)));
-        mesh->createBuffers();
-        mesh->syncVertexBuffersData();
-        mesh->syncFacesBuffersData();
-        con<MeshCtrl>().add_mesh("scanbody",mesh); //bunny FullBodyScan 20180205142827.cie
     });
     render_a = new("render") A;
+}
+
+void develop_backend::destruction() {
+
 }
 
 glm::vec3 orientN = glm::vec3(0,1,0);
@@ -79,9 +74,8 @@ void A::scan_line_animation(QTime& t) {
 
     percent += 1e-3;
     percent = percent > 1.0 ? 0: percent;
+//    LOG(INFO) << percent;
     con<RenderCtrl>().update(true);
-
-    LOG(INFO) << "percent: " << percent;
 
 //    glEnable(GL_DEPTH_TEST);
 //    glClearColor(0.2, 0.3, 0.3, 1.0);
@@ -129,7 +123,7 @@ void A::draw_model(QTime &t) {
 
 void develop_backend::draw_for(QString value) {
     if(value == "mesh") {
-        render_a->set_render(std::bind(&A::draw_model,render_a,std::placeholders::_1));
+        render_a->setRender(std::bind(&A::draw_model,render_a,std::placeholders::_1));
     }
     //    new ("texMix") RenderScript([=](RenderScript* rf){
     //        TGL.glEnable(GL_DEPTH_TEST);

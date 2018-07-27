@@ -28,7 +28,9 @@ public:
 
     Q_INVOKABLE void draw_for(QString value);
 
-    Q_INVOKABLE void instance();
+    Q_INVOKABLE void construction();
+
+    Q_INVOKABLE void destruction();
 private:
     A* render_a = nullptr;
 };

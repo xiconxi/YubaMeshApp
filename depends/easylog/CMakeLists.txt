@@ -1,1 +1,0 @@
-add_library(easylog STATIC easylogging++.cc)

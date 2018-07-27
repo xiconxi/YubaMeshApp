@@ -4,12 +4,14 @@ QT += qml quick
 CONFIG += plugin c++11
 
 TARGET = $$qtLibraryTarget($$TARGET)
-INCLUDEPATH += ../../depends
-INCLUDEPATH += ../
+INCLUDEPATH += \
+    ../../depends/easyloggingpp/src \
+    ../../depends/GLM \
+    ../../depends/EIGEN
+
 
 # Input
 SOURCES += \
-    ../../depends/easylog/easylogging++.cc \
     develop_plugin.cpp \
     develop_backend.cpp
 

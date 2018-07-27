@@ -4,4 +4,4 @@ cmake-build-*
 *.obj
 *.off
 *.cie
-./trash
+trash/
