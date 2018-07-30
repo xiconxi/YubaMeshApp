@@ -9,7 +9,7 @@
 
 3D拾取
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/3d_pick.png)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/face_pick.png)
 
 3D拾取(osx)
 hints:
@@ -20,7 +20,7 @@ hints:
 
 网格选区(osx)
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/face_select.png)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/face_select.gif)
 
 效果图：
 多纹理合并：
@@ -46,14 +46,14 @@ wireframe
 
 扫描动画
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/scan_animation.gif)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/scan_line.gif)
 
 选取动画
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/pick_select_animation.gif)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/pick_select.gif)
 
 截面动画(PCA完成朝向分析)
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/7-30-slice.gif)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/slice.gif)
 
 
