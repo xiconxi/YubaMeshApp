@@ -6,6 +6,7 @@
 
 #include <QStandardPaths>
 #include <fstream>
+#include <numeric>
 // OPENCV
 
 develop_backend::develop_backend(QObject* parent)
@@ -13,15 +14,22 @@ develop_backend::develop_backend(QObject* parent)
 {
 }
 
+glm::vec3 orientN = glm::vec3(0,0,1);
+
 void develop_backend::construction() {
-#if defined(Q_OS_OSX)
     QString prefix = "../PlugIns/MeshDevelop/shaders/";
-#elif defined(Q_OS_WIN)
-    QString prefix = "./MeshDevelop/shaders/";
-#endif
     RenderScript([=](QTime &t) mutable {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
+        PickableMesh* mesh = readObj("../PlugIns/GLViewer/mesh/body2.obj");
+        calculateNorm(mesh);
+        centerlized(mesh);
+        orientN = pca_analysic(mesh,2);
+        sortByVector(mesh, orientN);
+        mesh->createBuffers();
+        mesh->syncVertexBuffersData();
+        mesh->syncFacesBuffersData();
+        con<MeshCtrl>().addMesh("scanbody",mesh); //bunny FullBodyScan 20180205142827.cie
     });
     render_a = new("render") A;
 }
@@ -30,13 +38,14 @@ void develop_backend::destruction() {
 
 }
 
-glm::vec3 orientN = glm::vec3(0,1,0);
-
 A::A():RenderScript(std::bind(&A::scan_line_animation,this,std::placeholders::_1)){
     RenderScript([this](QTime& t){
         auto mesh = con<MeshCtrl>().mesh("scanbody");
 //        orientN = glm::normalize(glm::mat3(glm::inverse(mesh->model))*glm::vec3(0,1,0));
-        this->dot_v = glm::vec2(glm::dot(orientN, mesh->v[(*mesh->f.begin())[0]].mv), glm::dot(orientN, mesh->v[(*mesh->f.end())[0]].mv));
+
+        this->dot_v = glm::vec2(glm::dot(orientN, mesh->v[(*mesh->f.begin())[0]].mv), glm::dot(orientN, mesh->v[(*std::prev(mesh->f.end()))[1]].mv));
+        LOG(INFO) << "dot: " << this->dot_v[0] << ' ' << this->dot_v[1];
+
 //        auto he = halfEdge(mesh, mesh->f.begin(), mesh->f.end());
 
 //        std::fstream fileHandle;
@@ -74,25 +83,8 @@ void A::scan_line_animation(QTime& t) {
 
     percent += 1e-3;
     percent = percent > 1.0 ? 0: percent;
-//    LOG(INFO) << percent;
     con<RenderCtrl>().update(true);
 
-//    glEnable(GL_DEPTH_TEST);
-//    glClearColor(0.2, 0.3, 0.3, 1.0);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//    auto shader = con<ShaderCtrl>().shader("core",true);
-//    auto mesh = con<MeshCtrl>().mesh("scanbody");
-//    auto view = con<ViewCtrl>().view();
-//    if(!shader || !mesh || !view) return;
-
-//    shader->bind();
-//    shader->setUniformValue("camera_vp", view->MatrixVP());
-//    shader->setUniformValue("model", view->Model()*mesh->Model());
-
-//    mesh->drawElements();
-
-//    shader->release();
 }
 
 void A::draw_model(QTime &t) {

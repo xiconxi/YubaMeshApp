@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <channel>
+<!--    <plugin>
+        <name>develop</name>
+        <module>MeshDevelop</module>
+        <version>1.0</version>
+    </plugin>-->
     <plugin>
         <name>测量</name>
         <module>Measurement</module>
@@ -10,9 +15,4 @@
         <module>MeshMorph</module>
         <version>1.0</version>
     </plugin>-->
-    <plugin>
-        <name>develop</name>
-        <module>MeshDevelop</module>
-        <version>1.0</version>
-    </plugin>
 </channel>
