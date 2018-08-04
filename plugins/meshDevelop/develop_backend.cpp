@@ -22,10 +22,10 @@ void develop_backend::construction() {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
         PickableMesh* mesh = readObj("../PlugIns/GLViewer/mesh/body2.obj");
-        calculateNorm(mesh);
-        centerlized(mesh);
-        orientN = pca_analysic(mesh,2);
-        sortByVector(mesh, orientN);
+        YbCore::calculateNorm(mesh);
+        YbCore::centerlized(mesh);
+        orientN = YbCore::pca_analysic(mesh,2);
+        YbCore::sortByVector(mesh, orientN);
         mesh->createBuffers();
         mesh->syncVertexBuffersData();
         mesh->syncFacesBuffersData();
@@ -61,9 +61,9 @@ A::A():RenderScript(std::bind(&A::scan_line_animation,this,std::placeholders::_1
 }
 
 void A::scan_line_animation(QTime& t) {
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.2, 0.3, 0.3, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    gl.glEnable(GL_DEPTH_TEST);
+    gl.glClearColor(0.2, 0.3, 0.3, 1.0);
+    gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto shader = con<ShaderCtrl>().shader("base");
     auto mesh = con<MeshCtrl>().mesh("scanbody");
     auto view = con<ViewCtrl>().view();
@@ -88,9 +88,9 @@ void A::scan_line_animation(QTime& t) {
 }
 
 void A::draw_model(QTime &t) {
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.2, 0.3, 0.3, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    gl.glEnable(GL_DEPTH_TEST);
+    gl.glClearColor(0.2, 0.3, 0.3, 1.0);
+    gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto shader = con<ShaderCtrl>().shader("base");
     auto mesh = con<MeshCtrl>().mesh("scanbody");
     auto view = con<ViewCtrl>().view();
