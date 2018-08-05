@@ -4,6 +4,7 @@
 #include <QStandardPaths>
 #include "gl4window.h"
 #include <QProcess>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {    

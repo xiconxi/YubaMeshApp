@@ -12,7 +12,7 @@ HEADERS += \
     morph_plugin.h
 
 CONFIG(release, debug|release): {
-    DESTDIR = ../../$$TARGET
+    DESTDIR = ../../bin/$$TARGET
     RCC_DIR = ../tmp/$$TARGET
     MOC_DIR = ../tmp/$$TARGET
     OBJECTS_DIR = ../tmp/$$TARGET
