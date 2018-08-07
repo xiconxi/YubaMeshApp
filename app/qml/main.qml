@@ -27,7 +27,21 @@ YubaWindow {
                 })
             }
         }
+
+        DropArea{
+            id: dropArea
+            anchors.fill: parent
+            onDropped: {
+                if(drop.hasUrls && drop.urls.length === 1) {
+                    modelDroped(drop.urls[0])
+                }else
+                    drop.accept(true)
+            }
+            signal modelDroped(string fileUrl)
+        }
     }
+
+
 
     Rectangle{
         id:toolCategory
@@ -56,6 +70,7 @@ YubaWindow {
 //                    }
                 }
             }
+
             onCurrentIndexChanged:{
                 if( leftToolView.subView)
                     leftToolView.subView.destroy();
@@ -63,10 +78,18 @@ YubaWindow {
                 glViewer.registerModule(M.module)
 
                 var plugin_str ='import QtQuick 2.0; \nimport '+M.module + ' ' +
-                                M.version+'; \n'+'Tools{anchors.fill :parent\n'+
-                                'Component.onCompleted: SubBackends.construction()\n' +
-                                "Component.onDestruction: {glViewer.unregisterModule('"+M.module+"')\n"+
-                                "SubBackends.destruction()}}";
+                                M.version+'; \n'+'Tools{anchors.fill :parent\n
+                                Component.onCompleted: SubBackends.construction()\n' +
+                                "Component.onDestruction: {glViewer.unregisterModule('"+M.module+"')\n
+                                SubBackends.destruction()}
+            Connections{
+                target: dropArea
+                onModelDroped: {
+console.log(SubBackends.openFile(fileUrl))
+}
+            }
+
+                                }";
                 leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
             }
 
