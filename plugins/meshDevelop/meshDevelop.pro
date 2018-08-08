@@ -13,12 +13,14 @@ INCLUDEPATH += \
 # Input
 SOURCES += \
     develop_plugin.cpp \
-    develop_backend.cpp
+    PluginBackend.cpp \
+    ScanRender.cpp
 
 HEADERS += \
     develop_plugin.h \
-    develop_backend.h \
-    svpng.inc
+    svpng.inc \
+    PluginBackend.h \
+    ScanRender.h
 
 CONFIG(release, debug|release): {
     DESTDIR = ../../bin/$$TARGET
