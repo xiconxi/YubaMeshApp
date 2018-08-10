@@ -52,8 +52,13 @@ wireframe
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/pick_select.gif)
 
-截面动画(PCA完成朝向分析)
+点击截面(PCA完成朝向分析)
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/slice.gif)
+
+截面动画(PCA完成朝向分析)
+
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/slices.gif)
+
 
 
