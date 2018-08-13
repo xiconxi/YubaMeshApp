@@ -1,46 +1,38 @@
 #include "PluginBackend.h"
 #include "ScanRender.h"
-#include <mesh_proc>
+#include <YbCore/mesh_proc>
 PluginBackend::PluginBackend()
 {
 
 }
 
 void PluginBackend::construction() {
-    QString prefix = "../PlugIns/MeshDevelop/shaders/";
-    RenderScript([=](QTime &t) mutable {
+    RenderScript([&](QTime &t) mutable {
+        QString prefix = PLUGINPATH"MeshDevelop/shaders/";
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
-        PickableMesh* mesh = readObj("../PlugIns/GLViewer/mesh/body2.obj");
-        YbCore::calculateNorm(mesh);
-        YbCore::centerlized(mesh);
-        render_s->orient = YbCore::pca_analysic(mesh,2);
-        YbCore::sortByVector(mesh, render_s->orient);
-        mesh->createBuffers();
-        mesh->syncVertexBuffersData();
-        mesh->syncFacesBuffersData();
-        con<MeshCtrl>().addMesh("scanbody",mesh); //bunny FullBodyScan 20180205142827.cie
-    });
-    render_s = new("render") ScanRender;
+     });
+     render_s = new("render") ScanRender;
+     importMesh(PLUGINPATH"GLViewer/mesh/body2.obj","scanbody");
 }
 
+bool PluginBackend::importMesh(std::string url,std::string name) {
+    PickableMesh* mesh = YbCore::IO::readObj(url);
+    YbCore::calculateNorm(mesh);
+    YbCore::centerlized(mesh);
+
+    con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
+    RenderScript([=](QTime &t) {
+        mesh->createBufferScript();
+        mesh->syncVertexBuffersDataScript();
+        mesh->syncFacesBuffersDataScript();
+     });
+    return true;
+}
+
+
 void PluginBackend::draw_for(QString value) {
-    if(value == "mesh") {
-        render_s->setRender(std::bind(&ScanRender::draw_model,render_s,std::placeholders::_1));
-    }
-    //    new ("texMix") RenderScript([=](RenderScript* rf){
-    //        TGL.glEnable(GL_DEPTH_TEST);
-    //        TGL.glClearColor(0.2, 0.3, 0.3, 1.0);
-    //        TGL.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //        auto shader = SMM("texture");
-    //        auto mesh = TMM("bunny");
-    //        if(mesh->texture)
-    //            mesh->texture->bind();
-    //        shader->bind();
-    //        mesh->indicesDraw();
-    //        shader->release();
-    //        LOG(INFO) << "texture rendering. ";
-    //    });
+
 }
 
 
