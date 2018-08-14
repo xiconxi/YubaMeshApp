@@ -14,13 +14,17 @@ INCLUDEPATH += \
 SOURCES += \
     develop_plugin.cpp \
     PluginBackend.cpp \
-    ScanRender.cpp
+    ScanRender.cpp \
+    parameterize/TextureFaceMesh.cpp \
+    parameterize/ConnectedComponentAnalysis.cpp
 
 HEADERS += \
     develop_plugin.h \
     svpng.inc \
     PluginBackend.h \
-    ScanRender.h
+    ScanRender.h \
+    parameterize/TextureFaceMesh.h \
+    parameterize/ConnectedComponentAnalysis.h
 
 CONFIG(release, debug|release): {
     DESTDIR = ../../bin/$$TARGET
