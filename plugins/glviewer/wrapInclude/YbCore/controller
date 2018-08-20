@@ -1,0 +1,17 @@
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
+#include "../cpp/controller/CentralController.h"
+#include "../cpp/controller/MeshController.h"
+#include "../cpp/controller/RenderController.h"
+#include "../cpp/controller/ShaderController.h"
+#include "../cpp/controller/ViewController.h"
+
+// needed by windows ?
+//extern template ShaderCtrl& con();
+//extern template RenderCtrl& con();
+//extern template MeshCtrl  & con();
+//extern template ViewCtrl  & con();
+
+#include "../cpp/bases/IPluginBackend.h"
+
+#endif // CONTROLLER_H

@@ -1,0 +1,6 @@
+#ifndef MESH_PROC_H
+#define MESH_PROC_H
+#include "../cpp/mesh/meshCodes.h"
+#include "../cpp/mesh/meshProcessing.h"
+typedef PickableMesh CoreMesh;
+#endif // MESH_PROC_H
