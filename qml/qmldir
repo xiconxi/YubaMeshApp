@@ -1,3 +1,4 @@
-module Measurement
+module GLViewer
 Tools 1.0 ./Tools.qml
-plugin Measurement
+Viewer 1.0 ./Viewer.qml
+plugin GLViewer

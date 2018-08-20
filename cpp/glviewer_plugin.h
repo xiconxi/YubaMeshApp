@@ -2,7 +2,7 @@
 
 #include <QQmlExtensionPlugin>
 
-class MeasurementPlugin : public QQmlExtensionPlugin
+class GlviewerPlugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID QQmlExtensionInterface_iid)
