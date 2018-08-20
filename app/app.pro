@@ -49,7 +49,7 @@ osx {
     }CONFIG(debug,debug|release){
         suffix = _debug
     }
-    for(libname, $$list(GLViewer MeshDevelop)) { # Measurement
+    for(libname, $$list(GLViewer Measurement )) { #MeshDevelop
         glviewer.files += $$OUT_PWD/../bin/$${libname}$${suffix}
     }
     glviewer.files += $$PWD/../plugins/pluginsConfig.xml
