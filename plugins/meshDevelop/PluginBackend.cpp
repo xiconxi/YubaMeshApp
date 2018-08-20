@@ -1,8 +1,6 @@
 #include "PluginBackend.h"
 #include "ScanRender.h"
 #include <YbCore/mesh_proc>
-#include "parameterize/TextureFaceMesh.h"
-#include "parameterize/ConnectedComponentAnalysis.h"
 
 PluginBackend::PluginBackend()
 {
@@ -15,18 +13,13 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
+    importMesh(PLUGINPATH"GLViewer/mesh/body2.obj","scanbody");
     render_s = new("render") ScanRender;
-    importMesh(PLUGINPATH"GLViewer/mesh/body1.obj","scanbody");
 }
 
 bool PluginBackend::importMesh(std::string url,std::string name) {
 //    con<MeshCtrl>().mesh("bunny")->visible = false;
-//    PickableMesh* mesh = YbCore::IO::readObj(url);
-    PickableMesh* mesh = new PickableMesh();
-    auto result = Plugin::parameterize::loadObj(url);
-
-    mesh->v = result.second.v;
-    mesh->f = result.second.f;
+    PickableMesh* mesh = YbCore::IO::readObj(url);
     YbCore::calculateNorm(mesh);
     YbCore::centerlized(mesh);
     con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
@@ -35,9 +28,6 @@ bool PluginBackend::importMesh(std::string url,std::string name) {
         mesh->syncVertexBuffersDataScript();
         mesh->syncFacesBuffersDataScript();
     });
-
-//    Plugin::parameterize::border(result.first);
-
     return true;
 }
 

@@ -44,10 +44,14 @@ HEADERS += \
 
 
 osx {
-    glviewer.files += $$OUT_PWD/../bin/GLViewer
-#    glviewer.files += $$OUT_PWD/../MeshMorph
-    glviewer.files += $$OUT_PWD/../bin/Measurement
-    glviewer.files += $$OUT_PWD/../bin/MeshDevelop
+    CONFIG(release,debug|release){
+        suffix =
+    }CONFIG(debug,debug|release){
+        suffix = _debug
+    }
+    for(libname, $$list(GLViewer MeshDevelop)) { # Measurement
+        glviewer.files += $$OUT_PWD/../bin/$${libname}$${suffix}
+    }
     glviewer.files += $$PWD/../plugins/pluginsConfig.xml
     glviewer.path = Contents/PlugIns
     QMAKE_BUNDLE_DATA += glviewer
