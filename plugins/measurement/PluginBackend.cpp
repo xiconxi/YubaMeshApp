@@ -13,7 +13,7 @@
 #include "SliceRender.h"
 PluginBackend::PluginBackend(IPluginBackend* parent)
 {
-    LOG(INFO) << "measurement!";
+    LOG(INFO) << "measurement test !";
 }
 
 void PluginBackend::workMode(QString mode) {
