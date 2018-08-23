@@ -37,6 +37,7 @@ void FboNode::set_fps(qreal time) const{
 QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
     con<CentralCtrl>().setFboNode(this);
     auto ret =  &con<RenderCtrl>();
+
     con<ShaderCtrl>().initialize();
     con<ViewCtrl>().addView("cam",new ViewerMatrix());
 
@@ -48,12 +49,7 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
     con<CentralCtrl>().pickTool->createBufferScript();
 
 #ifdef LOAD_BUNNY
-    #if  defined(Q_OS_OSX)
-        std::string prefix = "../PlugIns/GLViewer/mesh/";
-    #elif defined(Q_OS_WIN)
-        std::string prefix = "./bin/GLViewer/mesh/";
-    #endif
-    auto mesh = YbCore::IO::readObj(prefix+"bunny.obj");
+    auto mesh = YbCore::IO::readObj(MESHPATH"bunny.obj");
     YbCore::calculateNorm(mesh);
     YbCore::centerlized(mesh);
 

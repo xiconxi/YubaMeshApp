@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = \
-#    depends \
+    depends \
     plugins \
     app
 

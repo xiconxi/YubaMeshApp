@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = GLViewer
 QT += qml quick
-CONFIG += plugin c++14
+CONFIG += plugin
 DEFINES += GLVIEWER_LIBRARY
 TARGET = $$qtLibraryTarget($$TARGET)
 INCLUDEPATH += \
@@ -56,7 +56,7 @@ HEADERS += \
     wrapInclude/YbCore/mesh_proc \
     wrapInclude/YbCore/scripts
 
-DESTDIR = ../../bin/$$TARGET
+DESTDIR = ../../modules/$$TARGET
 RCC_DIR = ../tmp/$$TARGET
 MOC_DIR = ../tmp/$$TARGET
 OBJECTS_DIR = ../tmp/$$TARGET
@@ -68,9 +68,8 @@ cpqmldir.path = $$DESTDIR
 cpshaders.files += glsl/*.glsl
 cpshaders.path = $$DESTDIR/glsl
 
-cpmeshes.files += mesh_data/*
-cpmeshes.path = $$DESTDIR/mesh
-
 COPIES += cpqmldir \
-    cpshaders \
-    cpmeshes
+    cpshaders
+osx{
+    QMAKE_POST_LINK += install_name_tool  -id @rpath/libGLViewer.dylib ../../modules/$$TARGET/libGLViewer.dylib
+}

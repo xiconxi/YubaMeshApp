@@ -77,6 +77,7 @@ Item {
             Component.onCompleted: {
                 SubBackends.setSliceCanvas(this)
             }
+            onSliceChanged:  slice.update()
         }
     }
 }

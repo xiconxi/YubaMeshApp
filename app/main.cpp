@@ -14,13 +14,12 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     qmlRegisterType<GL4Window>("YubaCore", 1, 0, "YubaWindow");
+    QDir::setCurrent(app.applicationDirPath());
 #ifdef Q_OS_OSX
-    QProcess().startDetached("ln -Fs ../PlugIns/GLViewer/libGLViewer.dylib libGLViewer.dylib");
     engine.addImportPath(app.applicationDirPath() +  "/../PlugIns/");
     engine.rootContext()->setContextProperty("appPath", QGuiApplication::applicationDirPath()+"/../PlugIns/");
     engine.rootContext()->setContextProperty("yubaDoc", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)+"/");
 #else
-    QDir::setCurrent(app.applicationDirPath());
     engine.addImportPath(app.applicationDirPath()+"/bin/");
     engine.rootContext()->setContextProperty("appPath", QGuiApplication::applicationDirPath());
     engine.rootContext()->setContextProperty("yubaDoc", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)+"/");

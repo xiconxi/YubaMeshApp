@@ -14,8 +14,10 @@
 
 #if  defined(Q_OS_OSX)
     #define PLUGINPATH "../PlugIns/"
+    #define MESHPATH  "../Mesh/"
 #elif defined(Q_OS_WIN)
-    #define PLUGINPATH "../PlugIns/"
+    #define PLUGINPATH "./bin/"
+    #define MESHPATH  "../Mesh/"
 #endif
 
 #endif // GLVIEWER_GLOBAL_H

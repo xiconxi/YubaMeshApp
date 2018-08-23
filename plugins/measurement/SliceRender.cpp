@@ -4,7 +4,7 @@
 
 SliceRender::SliceRender():RenderScript(std::bind(&SliceRender::drawModelWithSlice,this,std::placeholders::_1))
 {
-    LOG(INFO) << "sliceRender!";
+
 }
 
 void SliceRender::updateDis(float value) {

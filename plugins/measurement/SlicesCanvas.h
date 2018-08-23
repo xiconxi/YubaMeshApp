@@ -14,6 +14,8 @@ class SlicesCanvas : public QQuickPaintedItem
 public:
     SlicesCanvas();
     void paint(QPainter *painter) override;
+signals:
+    void sliceChanged();
 };
 
 #endif // SLICESCANVAS_H

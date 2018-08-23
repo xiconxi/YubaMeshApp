@@ -29,14 +29,16 @@ HEADERS += \
 TARGET = $$qtLibraryTarget($$TARGET)
 
 CONFIG(release, debug|release): {
-    DESTDIR = ../../bin/$$TARGET
+    DESTDIR = ../../modules/$$TARGET
     RCC_DIR = ../tmp/$$TARGET
     MOC_DIR = ../tmp/$$TARGET
     OBJECTS_DIR = ../tmp/$$TARGET
 
     INCLUDEPATH += ../glviewer/wrapInclude
-    LIBS +=-L$$OUT_PWD/../../bin/GLViewer -lGLViewer
+    LIBS +=-L$$OUT_PWD/../../modules/GLViewer -lGLViewer
 
+    INCLUDEPATH += ../../depends/YbMesh/inc
+    LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
 
     # Copy the qmldir file to the same folder as the plugin binary
     cpqmldir.files += qml/qmldir

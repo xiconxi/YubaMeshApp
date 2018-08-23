@@ -13,7 +13,7 @@
 #include "SliceRender.h"
 PluginBackend::PluginBackend(IPluginBackend* parent)
 {
-    LOG(INFO) << "measurement test !";
+
 }
 
 void PluginBackend::workMode(QString mode) {
@@ -25,17 +25,12 @@ void PluginBackend::workMode(QString mode) {
 }
 
 void PluginBackend::construction() {
-#if  defined(Q_OS_OSX)
-    std::string prefix = "../PlugIns/";
-#elif defined(Q_OS_WIN)
-    std::string prefix = "./bin/";
-#endif
-    QString shader_prefix = QString::fromStdString(prefix)+"Measurement/shaders/";
+    QString shader_prefix = PLUGINPATH"Measurement/shaders/";
     RenderScript([=](QTime& t) {
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(shader_prefix+"indices"),F(shader_prefix+"indices") });
     });
     render_s = new("base") SliceRender();
-    this->importMesh(prefix+"GLViewer/mesh/body2.obj","scanbody");
+    this->importMesh(MESHPATH"body2.obj","scanbody");
 }
 
 void PluginBackend::destruction() {
@@ -74,7 +69,7 @@ void PluginBackend::slice(float dis) {
 
 //    plugin::writeSlices(mesh, slice_res, QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/slice.obj");
 
-    canvas->update();
+    emit canvas->sliceChanged();
 }
 
 void PluginBackend::slice(int x, int y) {
@@ -115,8 +110,8 @@ bool PluginBackend::importMesh(std::string url,std::string name){
     QObject::connect(mesh,&PickableMesh::Selected, mesh, [=](PickableMesh* mesh){
         auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/selections.obj";
         plugin::writePartialMesh(mesh, con<CentralCtrl>().selectTool->getSelectedFace(), select_file);
-        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
-        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
+//        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
+//        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
 //        plugin::writePartialMesh(mesh, border_face, border_file);
     });
 

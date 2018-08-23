@@ -1,6 +1,7 @@
-TARGET = yubaApp
+TARGET = yubaMs
 QT += quick
 CONFIG += c++11
+QMAKE_RPATHDIR += @executable_path/../Frameworks
 
 TARGET = $$qtLibraryTarget($$TARGET)
 # The following define makes your compiler emit warnings if you use
@@ -15,7 +16,6 @@ DESTDIR = ../
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp
-
 RESOURCES += qml/qml.qrc
 INCLUDEPATH += ../depends
 #LIBS += -L$$OUT_PWD/../easylog/ -leasylog
@@ -36,12 +36,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 cpPluginsConfig.files += ../plugins/pluginsConfig.xml
 cpPluginsConfig.path = $$DESTDIR
 
-COPIES += cpPluginsConfig
+cpmeshes.files += mesh/*
+cpmeshes.path = $$DESTDIR/Mesh
+
+COPIES += cpPluginsConfig \
+            cpmeshes
 
 HEADERS += \
     gl4window.h
-
-
+ICON = yuba.icns
 
 osx {
     CONFIG(release,debug|release){
@@ -50,9 +53,17 @@ osx {
         suffix = _debug
     }
     for(libname, $$list(GLViewer Measurement )) { #MeshDevelop
-        glviewer.files += $$OUT_PWD/../bin/$${libname}$${suffix}
+        qtmodules.files += $$OUT_PWD/../modules/$${libname}$${suffix}
     }
-    glviewer.files += $$PWD/../plugins/pluginsConfig.xml
-    glviewer.path = Contents/PlugIns
-    QMAKE_BUNDLE_DATA += glviewer
+    qtmodules.files += $$PWD/../plugins/pluginsConfig.xml
+    qtmodules.path = Contents/PlugIns
+    QMAKE_BUNDLE_DATA += qtmodules
+
+    meshes.files += $$PWD/Mesh
+    meshes.path = Contents
+    QMAKE_BUNDLE_DATA += meshes
+
+    depends.files += $$OUT_PWD/../depends/FrameWorks
+    depends.path = Contents
+    QMAKE_BUNDLE_DATA += depends
 }
