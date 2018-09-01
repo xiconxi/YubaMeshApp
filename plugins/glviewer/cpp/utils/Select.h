@@ -10,6 +10,8 @@
 #include <glm/vec3.hpp>
 #include <QReadWriteLock>
 
+class InteractiveObject;
+
 class LIBSHARED_EXPORT SelectTool: public RenderScript {
 public:
     SelectTool();
@@ -18,9 +20,9 @@ public:
 
     void createBufferScript();
 
-    void sizingBufferScriptWrap(GLuint f_size);
-
     void clearSelect();
+
+    void syncBufferScript(InteractiveObject* object);
 
     std::vector<glm::ivec3>& getSelectedFace();
 
@@ -30,8 +32,6 @@ private:
 
     void drawResultSrcipt(QTime& t);
 
-    void syncBufferScript(QTime& t);
-
     void downloadSelectionsScript();
 
     void beginStreamQueryScript();
@@ -40,12 +40,11 @@ private:
 
     QQuickPaintedItem* areaItem;
 
-    GLuint xfb = 0,face_buffer, face_vao;
+    GLuint xfb = 0, face_vao;
 
     std::array<uint,2>  queries = {0,0};
     std::array<int,2>  stream_size = {0,0};
 
-    uint current_face_buffer_size = 0;
     std::vector<glm::ivec3> selected_faces;
 
     QReadWriteLock select_lock;

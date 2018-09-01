@@ -61,6 +61,11 @@ namespace glm {
         auto e = glm::transpose(s);
         return os <<'\n' <<  e[0] << '\n' << e[1] << '\n' << e[2] << '\n' << e[3];
     }
+    template<typename T, precision P = defaultp>
+    inline std::ostream &operator<<(std::ostream &os, const tmat3x3<T, P> &s) {
+        auto e = glm::transpose(s);
+        return os <<'\n' <<  e[0] << '\n' << e[1] << '\n' << e[2];
+    }
 }
 
 #endif // TYPE_MESH_H

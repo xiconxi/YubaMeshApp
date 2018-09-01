@@ -5,4 +5,5 @@
 #include "../../src/subdivision/sqrt3.h"
 #include "../../src/geometry.h"
 #include "../../src/visualization.h"
+#include "../../src/slice.h"
 #endif // YBMESH_H

@@ -2,5 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     glviewer \
-#    measurement \
-    meshDevelop \
+    measurement \
+#    meshDevelop \

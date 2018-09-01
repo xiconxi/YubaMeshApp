@@ -37,20 +37,24 @@ public:
     bool visible = true;
 
     YbMesh::indicesTriMesh<glm::vec3> m_v;
-
-protected:
-    uint vao, ibo, v_buffer;
-
     YbMesh::indicesTriMesh<glm::vec3> m_n;
-};
 
+private:
+    uint vao, ibo, v_buffer;
+};
+class SelectTool;
 class InteractiveObject: public QObject,public IDrawObject{
     Q_OBJECT
 public:
     InteractiveObject(TriMesh vmesh,TriMesh nmesh);
+    void createBufferScript() override;
+    void syncSelectBufferScript();
     ~InteractiveObject();
 signals:
     void FaceSelected(IDrawObject* object);
+private:
+    friend class SelectTool;
+    uint selected_buffer, selected_faces = 0;
 };
 
 #endif // PICKABLEMESH_H

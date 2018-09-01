@@ -13,6 +13,7 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
     importMesh(MESHPATH"bunny.obj","scanbody");
+    importMesh(MESHPATH"body2.obj","body2");
     render_s = new("render") ScanRender;
 }
 

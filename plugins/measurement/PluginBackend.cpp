@@ -29,7 +29,6 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(shader_prefix+"indices"),F(shader_prefix+"indices") });
     });
     render_s = new("base") SliceRender();
-    con<MeshCtrl>().mesh("bunny")->visible = false;
     this->importMesh(MESHPATH"body2.obj","scanbody");
 }
 
@@ -38,65 +37,69 @@ void PluginBackend::destruction() {
 }
 
 bool PluginBackend::importMesh(std::string url,std::string name){
-    auto meshvf = YbMesh::IO::importOBJ_V1(url);
-    PickableMesh* mesh = new PickableMesh();
-    mesh->v = std::move(meshvf.second.v());
-    mesh->f = std::move(meshvf.second.f());
-    YbCore::calculateNorm(mesh);
-    YbCore::centerlized(mesh);
-    norm = YbCore::pca_analysic(mesh,2);  glm::vec3(0,0,1);//
-    YbCore::sortByVector(mesh, norm);
-    con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
-
+    YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
+    auto object = new InteractiveObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    object->centerlized();
+    object->calculateNorm();
+    glm::mat3 pca   = YbMesh::slice::pca_analysic(triMesh,2);
+    glm::mat4 coord = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca));
+    object->model = coord * object->model;
+    norm = pca[2];
+    YbMesh::slice::sortByVector(triMesh,norm);
     RenderScript([=](QTime&) {
-        mesh->createBufferScript();
-        mesh->syncVertexBuffersDataScript();
-        mesh->syncFacesBuffersDataScript();
+        object->createBufferScript();
+        object->syncVertexBuffersDataScript();
+        object->syncFacesBuffersDataScript();
+        object->syncSelectBufferScript();
     });
+    con<InteractiveCtrl>().addInteractiveObject(name, object);
 
-    render_s->bounding_z[0] = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]);
-    render_s->bounding_z[1] = glm::dot(norm,mesh->v[(*std::prev(mesh->f.end()))[0]]);
+    auto& v = triMesh.v();
+    auto& f = triMesh.f();
+    render_s->bounding_z[0] = glm::dot(norm,v[(*f.begin())[0]]);
+    render_s->bounding_z[1] = glm::dot(norm,v[(*std::prev(f.end()))[0]]);
 
-    float model_height = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]-mesh->v[(*std::prev(mesh->f.end()))[0]]);
+    float model_height = glm::dot(norm,(v[(*f.begin())[0]]-v[(*std::prev(f.end()))[0]])*glm::mat3(coord));
     emit heightUpdate(QString::number(model_height,'f',2));
-    for(int i=0; i < mesh->f.size(); i += 10) {
-        gap = std::max(gap, abs(glm::dot(norm,mesh->v[mesh->f[i][0]]-mesh->v[mesh->f[i][1]]))*20);
+    for(int i=0; i < f.size(); i += 10) {
+        gap = std::max(gap, abs(glm::dot(norm,v[f[i][0]]-v[f[i][1]]))*20);
     }
 
-    QObject::connect(mesh,&PickableMesh::Selected, mesh, [=](PickableMesh* mesh){
-        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/selections.obj";
-        plugin::writePartialMesh(mesh, con<CentralCtrl>().selectTool->getSelectedFace(), select_file);
-//        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
-//        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
-//        plugin::writePartialMesh(mesh, border_face, border_file);
-    });
+//    QObject::connect(object,&PickableMesh::Selected, object, [=](PickableMesh* mesh){
+//        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/selections.obj";
+//        plugin::writePartialMesh(mesh, con<CentralCtrl>().selectTool->getSelectedFace(), select_file);
+////        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
+////        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
+////        plugin::writePartialMesh(mesh, border_face, border_file);
+//    });
     return true;
 }
 
 void PluginBackend::slice(float dis) {
-    PickableMesh* mesh = con<MeshCtrl>().mesh("scanbody");
-    auto interval = YbCore::getSliceInterval(mesh, norm, dis, gap);
+    auto mesh = con<InteractiveCtrl>().object("scanbody")->m_v;
+    auto interval = YbMesh::slice::getSliceInterval(mesh, norm, dis, gap);
     std::vector<std::array<glm::vec3,2>> slice_res;
     for(auto it = interval[0]; it != interval[1]; it++) {
-        if(YbCore::isFaceInersected(mesh, *it, norm, dis)) {
-            slice_res.emplace_back(YbCore::getFaceIntersection(mesh, *it, norm, dis));
+        if(YbMesh::slice::isFaceInersected(mesh, *it, norm, dis)) {
+            slice_res.emplace_back(YbMesh::slice::getFaceIntersection(mesh, *it, norm, dis));
         }
     }
     auto view = con<ViewCtrl>().view();
-    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*mesh->model;
+    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*con<InteractiveCtrl>().object("scanbody")->model;
     float w = canvas->width();
     float h = canvas->height();
     std::vector<float> girths;
 
     contours.clear();
+    auto& v = mesh.v();
     for(auto& intervals: plugin::sortContours(slice_res)) {
         contours.emplace_back(std::vector<QPoint>());
         girths.emplace_back(0);
         for(auto it = intervals[0]; it != intervals[1]; it++) {
-            glm::vec3 p = (glm::vec3(mvp*glm::vec4(mesh->v[(*it)[0][0]]+(*it)[0][2]*(mesh->v[(*it)[0][1]] - mesh->v[(*it)[0][0]]),1.0))+1.0f)*0.5f;
+            glm::vec3 p = (glm::vec3(mvp*glm::vec4(v[(*it)[0][0]]+(*it)[0][2]*(v[(*it)[0][1]] - v[(*it)[0][0]]),1.0))+1.0f)*0.5f;
             std::prev(contours.end())->emplace_back(QPoint(p[0]*w,(1-p[1])*h));
-            *std::prev(girths.end()) += glm::length(mesh->v[(*it)[0][0]]+(*it)[0][2]*(mesh->v[(*it)[0][1]] - mesh->v[(*it)[0][0]])-
-                                                    mesh->v[(*it)[1][0]]-(*it)[1][2]*(mesh->v[(*it)[1][1]] - mesh->v[(*it)[1][0]]));
+            *std::prev(girths.end()) += glm::length(v[(*it)[0][0]]+(*it)[0][2]*(v[(*it)[0][1]] - v[(*it)[0][0]])-
+                                                    v[(*it)[1][0]]-(*it)[1][2]*(v[(*it)[1][1]] - v[(*it)[1][0]]));
         }
     }
 
@@ -108,13 +111,15 @@ void PluginBackend::slice(float dis) {
 }
 
 void PluginBackend::slice(int x, int y) {
-    int f_id = con<CentralCtrl>().pickTool->getSingleFacePick(x,y);
+    int f_id = con<InteractiveCtrl>().pickTool->getSingleFacePick(x,y);
     if(f_id == -1) {
          canvas->update();
          return ;
     }
-    PickableMesh* mesh = con<MeshCtrl>().mesh("scanbody");
-    render_s->dis = glm::dot(norm, (mesh->v[mesh->f[f_id][0]]+mesh->v[mesh->f[f_id][1]]+mesh->v[mesh->f[f_id][2]])/3.0f);
+    auto mesh = con<InteractiveCtrl>().object("scanbody");
+    auto& v = mesh->m_v.v();
+    auto& f = mesh->m_v.f();
+    render_s->dis = glm::dot(norm, (v[f[f_id][0]]+v[f[f_id][1]]+v[f[f_id][2]])/3.0f);
     slice(render_s->dis);
     con<RenderCtrl>().update();
 }

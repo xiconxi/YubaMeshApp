@@ -13,10 +13,13 @@ void ScanRender::draw(QTime &t) {
     gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto shader = con<ShaderCtrl>().shader("base");
     auto view = con<ViewCtrl>().view();
-    auto mesh = con<InteractiveCtrl>().object("scanbody");
     shader->bind();
     shader->setUniformValue("camera_vp", view->MatrixVP());
-    shader->setUniformValue("model", view->Model()*mesh->Model());
-    mesh->drawElementScript();
+    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+        auto mesh = objectKV.second;
+        if(mesh->visible == false) continue;
+        shader->setUniformValue("model", view->Model()*mesh->Model());
+        mesh->drawElementScript();
+    }
     shader->release();
 }

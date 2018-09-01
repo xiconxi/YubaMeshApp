@@ -18,6 +18,7 @@ bool IPluginBackend::importMesh(std::string url, std::string name) {
         object->createBufferScript();
         object->syncVertexBuffersDataScript();
         object->syncFacesBuffersDataScript();
+        object->syncSelectBufferScript();
     });
     con<InteractiveCtrl>().addInteractiveObject(name, object);
     return true;

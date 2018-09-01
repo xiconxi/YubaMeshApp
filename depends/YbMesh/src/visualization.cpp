@@ -2,7 +2,7 @@
 #include <numeric>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <easylogging++.h>
+
 void YbMesh::visualization::calculateNorm(indicesTriMesh<glm::vec3>& vMesh, indicesTriMesh<glm::vec3>& nMesh){
     auto& v = vMesh.v();
     auto& vn = nMesh.v();

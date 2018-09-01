@@ -3,6 +3,8 @@
 #include <QOpenGLFunctions_4_0_Core>
 #include <easylogging++.h>
 #include "../controller/CentralController.h"
+#include "../controller/InteractiveController.h"
+#include "../utils/Select.h"
 #include <YbMesh/YbMesh.hpp>
 
 void IModelTransform::rotate(int dx, int dy) {
@@ -73,6 +75,16 @@ void IDrawObject::centerlized() {
 InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh):IDrawObject(vmesh,nmesh),QObject(nullptr){
 
 }
+
+void InteractiveObject::createBufferScript() {
+    IDrawObject::createBufferScript();
+    gl.glGenBuffers(1, &selected_buffer);
+}
+
+void InteractiveObject::syncSelectBufferScript() {
+    con<InteractiveCtrl>().selectTool->syncBufferScript(this);
+}
+
 InteractiveObject::~InteractiveObject(){
 
 }

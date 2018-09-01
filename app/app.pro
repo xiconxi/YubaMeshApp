@@ -52,7 +52,7 @@ osx {
     }CONFIG(debug,debug|release){
         suffix = _debug
     }
-    for(libname, $$list(GLViewer  MeshDevelop)) { # Measurement
+    for(libname, $$list(GLViewer Measurement)) { # Measurement MeshDevelop
         qtmodules.files += $$OUT_PWD/../modules/$${libname}$${suffix}
     }
     qtmodules.files += $$PWD/../plugins/pluginsConfig.xml

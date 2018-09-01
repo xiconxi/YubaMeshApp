@@ -20,13 +20,14 @@ std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> plugi
     return intervals;
 }
 
-void plugin::_RFF::writeSlices(PickableMesh* mesh, std::vector<std::array<glm::vec3,2>>&& slices, std::string file_name){
+void plugin::writeSlices(YbMesh::indicesTriMesh<glm::vec3> mesh, std::vector<std::array<glm::vec3,2>>&& slices, std::string file_name){
     std::fstream fileHandle;
     fileHandle.open(file_name,std::fstream::out|| std::ofstream::app);
+    auto& v = mesh.v();
     for(auto it = slices.begin(); it != slices.end(); it++) {
         std::array<glm::vec3,2> line {
-            mesh->v[(*it)[0][0]]+(*it)[0][2]*(mesh->v[(*it)[0][1]] - mesh->v[(*it)[0][0]]),
-            mesh->v[(*it)[1][0]]+(*it)[1][2]*(mesh->v[(*it)[1][1]] - mesh->v[(*it)[1][0]])
+            v[(*it)[0][0]]+(*it)[0][2]*(v[(*it)[0][1]] -v[(*it)[0][0]]),
+            v[(*it)[1][0]]+(*it)[1][2]*(v[(*it)[1][1]] -v[(*it)[1][0]])
         };
         fileHandle << "v " << line[0][0] << ' ' << line[0][1] << ' ' << line[0][2] << std::endl;
         fileHandle << "v " << line[1][0] << ' ' << line[1][1] << ' ' << line[1][2] << std::endl;
@@ -35,14 +36,14 @@ void plugin::_RFF::writeSlices(PickableMesh* mesh, std::vector<std::array<glm::v
     fileHandle.close();
 }
 
-void plugin::_RFF::writePartialMesh(PickableMesh *mesh, std::vector<glm::ivec3> &&faces, std::string file_name) {
+void plugin::writePartialMesh(YbMesh::indicesTriMesh<glm::vec3> mesh, std::vector<glm::ivec3> &&faces, std::string file_name) {
     std::map<int,int> v_rank;
     std::fstream fileHandle;
     fileHandle.open(file_name,std::ofstream::out || std::ofstream::app);
     for(auto it = faces.begin(); it != faces.end(); it++) {
         for(auto& i:{0,1,2}){
             if(v_rank.count((*it)[i])) continue;
-            auto& v = mesh->v[(*it)[i]];
+            auto& v = mesh.v()[(*it)[i]];
             v_rank[(*it)[i]] = v_rank.size()+1;
             fileHandle << "v " << v[0] << ' ' << v[1] << ' ' << v[2] << std::endl;
         }
@@ -56,29 +57,29 @@ void plugin::_RFF::writePartialMesh(PickableMesh *mesh, std::vector<glm::ivec3> 
 /// \param mesh
 /// \param faces
 /// 网格边界提取
-std::vector<glm::ivec2> plugin::_RFF::extractMeshBorder(PickableMesh *mesh, std::vector<glm::ivec3> &&faces) {
-    auto half_edges = YbCore::PairKeyMap<uint,uint>([](const YbCore::PairKey<int>& e1, const YbCore::PairKey<int>& e2){
-        return (e1.first == e2.first)?(e1.second > e2.second):(e1.first > e2.first);
-    });
-    std::vector<int> faceRefCnt(faces.size(), 0);
-    // 提取所有独享边
-    for(auto it = faces.begin(); it != faces.end(); it++) {
-        for(auto i:{0,1,2}) {
-            auto pair = std::make_pair((*it)[i==2?0:i+1], (*it)[i]);
-            auto self = std::make_pair((*it)[i], (*it)[i==2?0:i+1]);
-            if( half_edges.count(pair)){
-                auto Kpair = half_edges.find(pair);
-                faceRefCnt[(*Kpair).second]++;
-                faceRefCnt[it - faces.begin()]++;
-                half_edges.erase(Kpair);
-            }else{
-                half_edges[self] = it - faces.begin();
-            }
-        }
-    }
-    std::vector<glm::ivec2> borders;
-    for(auto it = half_edges.begin(); it != half_edges.end(); it++) {
-        borders.emplace_back(glm::ivec2(it->first.first,it->first.second));
-    }
-    return borders;
-}
+//std::vector<glm::ivec2> plugin::_RFF::extractMeshBorder(PickableMesh *mesh, std::vector<glm::ivec3> &&faces) {
+//    auto half_edges = YbCore::PairKeyMap<uint,uint>([](const YbCore::PairKey<int>& e1, const YbCore::PairKey<int>& e2){
+//        return (e1.first == e2.first)?(e1.second > e2.second):(e1.first > e2.first);
+//    });
+//    std::vector<int> faceRefCnt(faces.size(), 0);
+//    // 提取所有独享边
+//    for(auto it = faces.begin(); it != faces.end(); it++) {
+//        for(auto i:{0,1,2}) {
+//            auto pair = std::make_pair((*it)[i==2?0:i+1], (*it)[i]);
+//            auto self = std::make_pair((*it)[i], (*it)[i==2?0:i+1]);
+//            if( half_edges.count(pair)){
+//                auto Kpair = half_edges.find(pair);
+//                faceRefCnt[(*Kpair).second]++;
+//                faceRefCnt[it - faces.begin()]++;
+//                half_edges.erase(Kpair);
+//            }else{
+//                half_edges[self] = it - faces.begin();
+//            }
+//        }
+//    }
+//    std::vector<glm::ivec2> borders;
+//    for(auto it = half_edges.begin(); it != half_edges.end(); it++) {
+//        borders.emplace_back(glm::ivec2(it->first.first,it->first.second));
+//    }
+//    return borders;
+//}

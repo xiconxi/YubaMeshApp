@@ -18,43 +18,41 @@ void SelectTool::clearSelect() {
 void SelectTool::SelectScript(QTime& t) {
     auto shader = con<ShaderCtrl>().shader("select",true);
     auto view = con<ViewCtrl>().view();
-    auto mesh = con<InteractiveCtrl>().focus();
-    if(mesh == nullptr) return ;
-    this->beginStreamQueryScript();
-
     shader->bind();
     shader->setUniformValue("camera_vp", view->MatrixVP());
-    shader->setUniformValue("model", view->Model()*mesh->Model());
-    gl.glBindTexture(GL_TEXTURE_2D, areaItem->textureProvider()->texture()->textureId());
+    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+        auto mesh = objectKV.second;
+        if(mesh->visible == false) continue;
+        this->beginStreamQueryScript();
 
-    gl.glEnable(GL_RASTERIZER_DISCARD);
-    gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, xfb);
-    gl.glBeginTransformFeedback(GL_POINTS);
+        shader->setUniformValue("model", view->Model()*mesh->Model());
+        gl.glBindTexture(GL_TEXTURE_2D, areaItem->textureProvider()->texture()->textureId());
 
-    mesh->drawElementScript();
+        gl.glEnable(GL_RASTERIZER_DISCARD);
+        gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, xfb);
+        gl.glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,mesh->selected_buffer);
+        gl.glBeginTransformFeedback(GL_POINTS);
 
-    gl.glDisable(GL_RASTERIZER_DISCARD);
-    gl.glEndTransformFeedback();
-    gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+        mesh->drawElementScript();
 
-    shader->release();
+        gl.glDisable(GL_RASTERIZER_DISCARD);
+        gl.glEndTransformFeedback();
+        gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
-    this->endStreamQueryScript();
-    if(stream_size[0] > 0) {
-
-//        this->downloadSelectionsScript();
-//        emit mesh->FaceSelected(mesh);
+        this->endStreamQueryScript();
+        mesh->selected_faces = stream_size[0] > 0? stream_size[0]:0;
     }
+    shader->release();
 }
 
 void SelectTool::downloadSelectionsScript() {
-    selected_faces.resize(stream_size[0]);
-    gl.glBindBuffer(GL_COPY_READ_BUFFER, face_buffer);
-    const void *data = gl.glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
-    if (data)
-        memcpy(selected_faces.data(), data, selected_faces.size() * sizeof(selected_faces[0]));
-    gl.glUnmapBuffer(GL_COPY_READ_BUFFER);
-    gl.glBindBuffer(GL_COPY_READ_BUFFER, 0);
+//    selected_faces.resize(stream_size[0]);
+//    gl.glBindBuffer(GL_COPY_READ_BUFFER, face_buffer);
+//    const void *data = gl.glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
+//    if (data)
+//        memcpy(selected_faces.data(), data, selected_faces.size() * sizeof(selected_faces[0]));
+//    gl.glUnmapBuffer(GL_COPY_READ_BUFFER);
+//    gl.glBindBuffer(GL_COPY_READ_BUFFER, 0);
 }
 
 std::vector<glm::ivec3>& SelectTool::getSelectedFace() {
@@ -62,44 +60,39 @@ std::vector<glm::ivec3>& SelectTool::getSelectedFace() {
 }
 
 void SelectTool::drawResultSrcipt(QTime& t) {
-    if(stream_size[0] > 0 ) {
-        gl.glEnable(GL_POLYGON_OFFSET_FILL);
-        gl.glPolygonOffset(-1.0,-1.0);
-        auto shader = con<ShaderCtrl>().shader("selection",true);
-        auto mesh = con<InteractiveCtrl>().focus();
-        shader->bind();
-        shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
+    auto shader = con<ShaderCtrl>().shader("selection",true);
+    auto view = con<ViewCtrl>().view();
+    shader->bind();
+    shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
+    gl.glEnable(GL_POLYGON_OFFSET_FILL);
+    gl.glPolygonOffset(-1.0,-1.0);
+    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+        auto mesh = objectKV.second;
+        if(mesh->selected_faces == 0) continue;
         shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
-        mesh->drawElementBufferScript(face_buffer, 0, stream_size[0]);
-        shader->release();
-        gl.glDisable(GL_POLYGON_OFFSET_FILL);
+        mesh->drawElementBufferScript(mesh->selected_buffer,0,mesh->selected_faces);
     }
-}
-
-void SelectTool::sizingBufferScriptWrap(GLuint f_size) {
-    if(f_size > current_face_buffer_size) {
-        current_face_buffer_size = f_size;
-        AnonymouseScript(SelectTool::syncBufferScript);
-    }
+    shader->release();
+    gl.glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
 void SelectTool::createBufferScript() {
     gl.glGenTransformFeedbacks(1, &xfb);
-    gl.glGenBuffers(1, &face_buffer);
     gl.glGenVertexArrays(1, &face_vao);
 }
 
-void SelectTool::syncBufferScript(QTime &t) {
+void SelectTool::syncBufferScript(InteractiveObject* object) {
     gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, this->xfb);
-    gl.glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, this->face_buffer);
-    gl.glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, current_face_buffer_size * sizeof(int) * 3, nullptr, GL_DYNAMIC_COPY);
-    gl.glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,this->face_buffer);
+    gl.glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, object->selected_buffer);
+    gl.glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, object->m_v.f().size() * sizeof(int) * 3, nullptr, GL_DYNAMIC_COPY);
+    gl.glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,object->selected_buffer);
     gl.glBindVertexArray( this->face_vao);
-    gl.glBindBuffer(GL_ARRAY_BUFFER, this->face_buffer);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, object->selected_buffer);
     gl.glVertexAttribIPointer(0, 3, GL_INT, sizeof(GLint)*3, NULL);
     gl.glEnableVertexAttribArray(0);
+    gl.glBindVertexArray(0);
+    gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 }
-
 
 void SelectTool::areasFaceSelect(QQuickPaintedItem *areaItem) {
     this->areaItem = areaItem;

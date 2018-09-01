@@ -12,7 +12,8 @@ HEADERS += \
     src/types/HalfEdge.h \
     src/types/type_mesh.h \
     src/subdivision/sqrt3.h \
-    src/visualization.h
+    src/visualization.h \
+    src/slice.h
 
 SOURCES += \
     ../easyloggingpp/src/easylogging++.cc \
@@ -20,7 +21,8 @@ SOURCES += \
     src/geometry.cpp \
     src/types/HalfEdge.cpp \
     src/subdivision/sqrt3.cpp \
-    src/visualization.cpp
+    src/visualization.cpp \
+    src/slice.cpp
 
 TARGET = YbMesh
 DESTDIR = ../FrameWorks/

@@ -23,7 +23,6 @@ void InteractiveCtrl::addInteractiveObject(std::string name,InteractiveObject* o
     } else {
         // conflit
     }
-    selectTool->sizingBufferScriptWrap(object->m_v.f().size());
     focus_object = object;
 }
 
