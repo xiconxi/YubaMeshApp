@@ -12,12 +12,13 @@ indicesTriMesh<glm::vec3> YbMesh::IO::importOBJ_V0(std::string filename) {
     std::ifstream fileHandle(filename,std::ios_base::in);
     indicesTriMesh<glm::vec3> vmesh(std::make_shared<std::vector<glm::vec3>>(),
                                     std::make_shared<std::vector<glm::ivec3>>());
-
     if(!fileHandle.is_open() ) {
         LOG(INFO) << "failed to load obj: " << filename;
         return vmesh;
     }
     char tmpLine[500];
+    enum F_MODE{V, VT, VTN} f_mode;
+    f_mode = F_MODE(VTN + 1);
     for(;fileHandle.getline(tmpLine,500);){
         if ( tmpLine[0] == '#' ) continue;
         char *start;
@@ -27,9 +28,27 @@ indicesTriMesh<glm::vec3> YbMesh::IO::importOBJ_V0(std::string filename) {
             sscanf(start,"v %f%f%f",&xyz[0],&xyz[1],&xyz[2]);
         }else if((start=strstr(tmpLine,"f "))){
             vmesh.f().resize(vmesh.f().size()+1);
-            auto& vf = *(std::prev(vmesh.f().end()));
-            sscanf(start,"f %d %d %d",&vf[0] ,&vf[1], &vf[2]);
-            vf -= 1;
+            auto& f = *(std::prev(vmesh.f().end()));
+            switch (f_mode) {
+            case VTN:
+                sscanf(start,"f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d",&f[0],&f[1],&f[2]);
+                    break;
+            case VT:
+                sscanf(start,"f %d/%*d %d/%*d %d/%*d",&f[0],&f[1],&f[2]);
+                    break;
+            case V:
+                sscanf(start,"f %d %d %d",&f[0],&f[1],&f[2]);
+                    break;
+            default:
+                if(sscanf(start,"f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d",&f[0],&f[1],&f[2])==3)
+                    f_mode = VTN;
+                else if(sscanf(start,"f %d/%*d %d/%*d %d/%*d",&f[0],&f[1],&f[2])==3)
+                    f_mode = VT;
+                else if(sscanf(start,"f %d %d %d",&f[0],&f[1],&f[2])==3)
+                    f_mode = V;
+                break;
+            }
+            f -= 1;
         }
     }
     LOG(INFO) << filename << ' ' << vmesh.v().size() << ' ' << vmesh.f().size();
@@ -89,10 +108,10 @@ std::ostream& operator << (std::ostream &os, std::vector<T> &faces){
 }
 
 void YbMesh::IO::exportObj(indicesTriMesh<glm::vec3>& mesh, std::string filename) {
-    if(mesh.v().size() == 0 || mesh.f().size() == 0) {
-        std::cout << "export target is empty: " << filename  << std::endl;
-        return ;
-    }
+//    if(mesh.v().size() == 0 || mesh.f().size() == 0) {
+//        std::cout << "export target is empty: " << filename  << std::endl;
+//        return ;
+//    }
     std::ofstream file(filename,std::ios_base::out);
     if(!file.is_open() ) {
         std::cout << "failed to export obj: " << filename << std::endl;

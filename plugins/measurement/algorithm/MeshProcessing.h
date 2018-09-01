@@ -4,7 +4,6 @@
 #include <vector>
 #include <array>
 #include <glm/vec3.hpp>
-#include <YbCore/mesh_proc>
 #include <type_traits>
 
 namespace plugin{

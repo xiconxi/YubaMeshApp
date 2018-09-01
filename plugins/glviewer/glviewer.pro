@@ -7,28 +7,27 @@ TARGET = $$qtLibraryTarget($$TARGET)
 INCLUDEPATH += \
     ../../depends/easyloggingpp/src \
     ../../depends/GLM \
-    ../../depends/EIGEN
+    ../../depends/EIGEN \
+    ../../depends/YbMesh/inc \
 
 # Input
 SOURCES += \
-    ../../depends/easyloggingpp/src/easylogging++.cc \
     cpp/FboNode.cpp \
     cpp/glviewer_plugin.cpp \
     cpp/controller/CentralController.cpp \
-    cpp/controller/MeshController.cpp \
+    cpp/controller/InteractiveController.cpp \
+#    cpp/controller/MeshController.cpp \
     cpp/controller/RenderController.cpp \
     cpp/controller/ShaderController.cpp \
     cpp/controller/ViewController.cpp \
-    cpp/mesh/meshCodes.cpp \
-    cpp/mesh/meshProcessing.cpp \
     cpp/mesh/PickableMesh.cpp \
-    cpp/mesh/half_edge.cpp \
     cpp/utils/Select.cpp \
     cpp/utils/SelectCanvas.cpp \
     cpp/utils/Pick.cpp \
-    cpp/bases/IPluginBackend.cpp \
     cpp/utils/ScriptSamples.cpp \
-    cpp/bases/IRenderScript.cpp
+    cpp/bases/IPluginBackend.cpp \
+    cpp/bases/IRenderScript.cpp \
+
 
 
 HEADERS += \
@@ -38,14 +37,12 @@ HEADERS += \
     cpp/bases/IPluginBackend.h \
     cpp/bases/ISingleton.inc \
     cpp/controller/CentralController.h \
-    cpp/controller/MeshController.h \
+    cpp/controller/InteractiveController.h \
     cpp/controller/RenderController.h \
     cpp/controller/ShaderController.h \
     cpp/controller/ViewController.h \
-    cpp/mesh/meshCodes.h \
-    cpp/mesh/meshProcessing.h \
+#    cpp/mesh/meshProcessing.h \
     cpp/mesh/PickableMesh.h \
-    cpp/mesh/half_edge.h \
     cpp/utils/Select.h \
     cpp/utils/Pick.h \
     cpp/utils/SelectCanvas.h \
@@ -53,8 +50,9 @@ HEADERS += \
     cpp/bases/IRenderScript.h \
     wrapInclude/YbCore/controller \
     wrapInclude/YbCore/coretool \
-    wrapInclude/YbCore/mesh_proc \
-    wrapInclude/YbCore/scripts
+    wrapInclude/YbCore/scripts \
+
+
 
 DESTDIR = ../../modules/$$TARGET
 RCC_DIR = ../tmp/$$TARGET
@@ -71,5 +69,7 @@ cpshaders.path = $$DESTDIR/glsl
 COPIES += cpqmldir \
     cpshaders
 osx{
-    QMAKE_POST_LINK += install_name_tool  -id @rpath/libGLViewer.dylib ../../modules/$$TARGET/libGLViewer.dylib
+    INCLUDEPATH += ../../depends/YbMesh/inc
+    LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
+    QMAKE_POST_LINK += install_name_tool -id @rpath/libGLViewer.dylib ../../modules/$$TARGET/libGLViewer.dylib
 }

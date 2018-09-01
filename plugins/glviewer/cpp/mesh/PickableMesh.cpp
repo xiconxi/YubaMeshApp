@@ -3,18 +3,9 @@
 #include <QOpenGLFunctions_4_0_Core>
 #include <easylogging++.h>
 #include "../controller/CentralController.h"
+#include <YbMesh/YbMesh.hpp>
 
-uint PickableMesh::numerical_mesh_amount = 0;
-
-PickableMesh::PickableMesh():numerical_id(numerical_mesh_amount++) {
-
-}
-
-PickableMesh::~PickableMesh(){
-    LOG(INFO) << "mesh destruction: " <<this;
-}
-
-void PickableMesh::rotate(int dx, int dy) {
+void IModelTransform::rotate(int dx, int dy) {
     if (abs(dx) > abs(dy)) {
         model = glm::rotate(glm::mat4(), dx * 0.003f, glm::vec3(0, 1, 0)) * model;
     } else if (abs(dy) > abs(dx) ) {
@@ -22,26 +13,30 @@ void PickableMesh::rotate(int dx, int dy) {
     }
 }
 
-QMatrix4x4 PickableMesh::Model(){
+QMatrix4x4 IModelTransform::Model(){
     return QMatrix4x4(glm::value_ptr(this->model), 4, 4);
 }
 
-void PickableMesh::scaleBy(float s) {
+void IModelTransform::scaleBy(float s) {
     model = glm::scale(glm::mat4(), (1+s)*glm::vec3(1,1,1)) * model;
 }
 
-void PickableMesh::createBufferScript() {
+void IDrawObject::createBufferScript() {
     gl.glGenVertexArrays(1, &vao);
     gl.glGenBuffers(1, &v_buffer);
     gl.glGenBuffers(1, &ibo);
 }
 
-void PickableMesh::syncFacesBuffersDataScript() {
+void IDrawObject::syncFacesBuffersDataScript() {
+    auto& f = m_v.f();
     gl.glBindBuffer(GL_ARRAY_BUFFER, ibo);
     gl.glBufferData(GL_ARRAY_BUFFER, f.size()*sizeof(f[0]), f.data(), GL_STATIC_DRAW);
 }
 
-void PickableMesh::syncVertexBuffersDataScript() {
+void IDrawObject::syncVertexBuffersDataScript() {
+    auto& f = m_v.f();
+    auto& v = m_v.v();
+    auto& vn = m_n.v();
     gl.glBindVertexArray(vao);
     gl.glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
     gl.glBufferData(GL_ARRAY_BUFFER, v.size()*(sizeof(v[0])+sizeof(vn[0])), nullptr, GL_STATIC_DRAW);
@@ -56,13 +51,28 @@ void PickableMesh::syncVertexBuffersDataScript() {
     gl.glBindVertexArray(0);
 }
 
-void PickableMesh::drawElementScript(uint start, uint size) {
+void IDrawObject::drawElementScript(uint start, uint size) {
     drawElementBufferScript(ibo,start,size);
 }
 
-void PickableMesh::drawElementBufferScript(uint buffer_id, uint start, uint size) {
+void IDrawObject::drawElementBufferScript(uint buffer_id, uint start, uint size) {
     gl.glBindVertexArray(vao);
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id);
-    gl.glDrawElements(GL_TRIANGLES, (size?size:f.size())*3, GL_UNSIGNED_INT, (GLvoid*)(start*3*sizeof(unsigned int)));
+    gl.glDrawElements(GL_TRIANGLES, (size?size:m_v.f().size())*3, GL_UNSIGNED_INT, (GLvoid*)(start*3*sizeof(unsigned int)));
     gl.glBindVertexArray(0);
+}
+
+void IDrawObject::calculateNorm() {
+    YbMesh::visualization::calculateNorm(m_v, m_n);
+}
+
+void IDrawObject::centerlized() {
+    model = YbMesh::visualization::centerlized(m_v);
+}
+
+InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh):IDrawObject(vmesh,nmesh),QObject(nullptr){
+
+}
+InteractiveObject::~InteractiveObject(){
+
 }

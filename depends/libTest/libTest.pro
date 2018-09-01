@@ -10,11 +10,11 @@ INCLUDEPATH += \
     ../../depends/GLM \
     ../../depends/EIGEN
 
-INCLUDEPATH += ../yubaMesh
-LIBS +=-L$$OUT_PWD/../bin/ -lYubaMesh
+INCLUDEPATH += ../YbMesh/inc
+LIBS +=-L$$OUT_PWD/../FrameWorks/ -lYbMesh
 
 osx{
-   frameworks.files += $$OUT_PWD/../bin/
-   frameworks.path = Contents/FrameWorks
+   frameworks.files += $$OUT_PWD/../FrameWorks
+   frameworks.path = Contents
    QMAKE_BUNDLE_DATA += frameworks
 }

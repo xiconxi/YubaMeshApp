@@ -41,7 +41,6 @@ YubaWindow {
         }
     }
 
-
     Rectangle{
         id:toolCategory
         height: 20
@@ -81,7 +80,7 @@ YubaWindow {
                                 Component.onCompleted: SubBackends.construction()\n' +
                                 "Component.onDestruction: {glViewer.unregisterModule('"+M.module+"')\n
                                                             SubBackends.destruction()}
-                                Connections{ target: dropArea; onModelDroped: SubBackends.openFile(fileUrl) }
+                                Connections{ target: dropArea; onModelDroped: SubBackends.importMesh(fileUrl) }
                                 }";
                 leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
             }

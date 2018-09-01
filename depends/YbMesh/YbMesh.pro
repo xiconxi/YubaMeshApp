@@ -8,11 +8,19 @@ INCLUDEPATH += \
 HEADERS += \
     inc/YbMesh/YbMesh.hpp \
     src/meshcodecs/format_obj.h \
-    src/type_mesh.h
+    src/geometry.h \
+    src/types/HalfEdge.h \
+    src/types/type_mesh.h \
+    src/subdivision/sqrt3.h \
+    src/visualization.h
 
 SOURCES += \
     ../easyloggingpp/src/easylogging++.cc \
-    src/meshcodecs/format_obj.cpp
+    src/meshcodecs/format_obj.cpp \
+    src/geometry.cpp \
+    src/types/HalfEdge.cpp \
+    src/subdivision/sqrt3.cpp \
+    src/visualization.cpp
 
 TARGET = YbMesh
 DESTDIR = ../FrameWorks/

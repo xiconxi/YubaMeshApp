@@ -1,6 +1,5 @@
 #include "CentralController.h"
 #include <QTime>
-#include "MeshController.h"
 #include "ViewController.h"
 #include "ShaderController.h"
 #include "RenderController.h"
@@ -27,9 +26,6 @@ void CentralCtrl::releaseModuleResource(std::string name) {
     name += "~";
     for(auto& e:resource[name]) {
         switch (e.first) {
-        case MESH:
-            con<MeshCtrl>().releaseMesh(name+e.second);
-            break;
         case RENDER:
             con<RenderCtrl>().releaseScript(name+e.second);
             break;

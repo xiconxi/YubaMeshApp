@@ -1,11 +1,11 @@
 #include "RenderController.h"
 #include "ViewController.h"
+#include "InteractiveController.h"
 #include <QOpenGLFramebufferObjectFormat>
 #include <QTime>
 #include <QThread>
 #include <QImage>
 #include "../FboNode.h"
-#include "../utils/Select.h"
 #include "../utils/Pick.h"
 
 template<>
@@ -40,7 +40,7 @@ QOpenGLFramebufferObject* RenderCtrl::createFramebufferObject(const QSize &size)
     frame_buffer = new QOpenGLFramebufferObject(size, format);
 
     con<ViewCtrl>().updateSize(size.width(), size.height());
-    con<CentralCtrl>().pickTool->sizingScreenBufferScript();
+    con<InteractiveCtrl>().pickTool->sizingScreenBufferScript();
     return  frame_buffer;
 }
 

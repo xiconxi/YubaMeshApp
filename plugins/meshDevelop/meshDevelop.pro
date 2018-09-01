@@ -22,25 +22,26 @@ HEADERS += \
     PluginBackend.h \
     ScanRender.h \
 
-DESTDIR = ../../bin/$$TARGET
-RCC_DIR = ../tmp/$$TARGET
-MOC_DIR = ../tmp/$$TARGET
-OBJECTS_DIR = ../tmp/$$TARGET
+CONFIG(release, debug|release): {
+    DESTDIR = ../../modules/$$TARGET
+    RCC_DIR = ../tmp/$$TARGET
+    MOC_DIR = ../tmp/$$TARGET
+    OBJECTS_DIR = ../tmp/$$TARGET
 
-CONFIG(release,debug|release){
-    LIBS +=-L$$OUT_PWD/../../bin/GLViewer -lGLViewer
-}CONFIG(debug,debug|release){
-    LIBS +=-L$$OUT_PWD/../../bin/GLViewer_debug -lGLViewer_debug
+    INCLUDEPATH += ../glviewer/wrapInclude
+    LIBS +=-L$$OUT_PWD/../../modules/GLViewer -lGLViewer
+
+    INCLUDEPATH += ../../depends/YbMesh/inc
+    LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
+
+    # Copy the qmldir file to the same folder as the plugin binary
+    cpqmldir.files += qml/qmldir
+    cpqmldir.files += qml/Tools.qml
+    cpqmldir.path = $$DESTDIR
+
+    cpshaders.files += shaders/*.glsl
+    cpshaders.path = $$DESTDIR/shaders
+
+    COPIES += cpqmldir \
+        cpshaders
 }
-INCLUDEPATH += ../glviewer/wrapInclude
-
-# Copy the qmldir file to the same folder as the plugin binary
-cpqmldir.files += qml/qmldir
-cpqmldir.files += qml/Tools.qml
-cpqmldir.path = $$DESTDIR
-
-cpshaders.files += shaders/*.glsl
-cpshaders.path = $$DESTDIR/shaders
-
-COPIES += cpqmldir \
-    cpshaders

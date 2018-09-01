@@ -1,7 +1,6 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 #include "../bases/glviewerGlobal.inc"
-#include <easylogging++.h>
 
 template <typename T>
 class ICtrl{

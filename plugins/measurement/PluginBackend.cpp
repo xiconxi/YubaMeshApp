@@ -4,12 +4,11 @@
 #include "PluginBackend.h"
 #include <YbCore/controller>
 #include <YbCore/coretool>
-#include <YbCore/mesh_proc>
 #include <glm/glm.hpp>
 #include <QStandardPaths>
 #include <glm/gtc/matrix_transform.hpp>
 #include "./algorithm/MeshProcessing.h"
-
+#include <YbMesh/YbMesh.hpp>
 #include "SliceRender.h"
 PluginBackend::PluginBackend(IPluginBackend* parent)
 {
@@ -30,11 +29,48 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(shader_prefix+"indices"),F(shader_prefix+"indices") });
     });
     render_s = new("base") SliceRender();
+    con<MeshCtrl>().mesh("bunny")->visible = false;
     this->importMesh(MESHPATH"body2.obj","scanbody");
 }
 
 void PluginBackend::destruction() {
 
+}
+
+bool PluginBackend::importMesh(std::string url,std::string name){
+    auto meshvf = YbMesh::IO::importOBJ_V1(url);
+    PickableMesh* mesh = new PickableMesh();
+    mesh->v = std::move(meshvf.second.v());
+    mesh->f = std::move(meshvf.second.f());
+    YbCore::calculateNorm(mesh);
+    YbCore::centerlized(mesh);
+    norm = YbCore::pca_analysic(mesh,2);  glm::vec3(0,0,1);//
+    YbCore::sortByVector(mesh, norm);
+    con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
+
+    RenderScript([=](QTime&) {
+        mesh->createBufferScript();
+        mesh->syncVertexBuffersDataScript();
+        mesh->syncFacesBuffersDataScript();
+    });
+
+    render_s->bounding_z[0] = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]);
+    render_s->bounding_z[1] = glm::dot(norm,mesh->v[(*std::prev(mesh->f.end()))[0]]);
+
+    float model_height = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]-mesh->v[(*std::prev(mesh->f.end()))[0]]);
+    emit heightUpdate(QString::number(model_height,'f',2));
+    for(int i=0; i < mesh->f.size(); i += 10) {
+        gap = std::max(gap, abs(glm::dot(norm,mesh->v[mesh->f[i][0]]-mesh->v[mesh->f[i][1]]))*20);
+    }
+
+    QObject::connect(mesh,&PickableMesh::Selected, mesh, [=](PickableMesh* mesh){
+        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/selections.obj";
+        plugin::writePartialMesh(mesh, con<CentralCtrl>().selectTool->getSelectedFace(), select_file);
+//        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
+//        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
+//        plugin::writePartialMesh(mesh, border_face, border_file);
+    });
+    return true;
 }
 
 void PluginBackend::slice(float dis) {
@@ -46,7 +82,6 @@ void PluginBackend::slice(float dis) {
             slice_res.emplace_back(YbCore::getFaceIntersection(mesh, *it, norm, dis));
         }
     }
-
     auto view = con<ViewCtrl>().view();
     auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*mesh->model;
     float w = canvas->width();
@@ -82,40 +117,6 @@ void PluginBackend::slice(int x, int y) {
     render_s->dis = glm::dot(norm, (mesh->v[mesh->f[f_id][0]]+mesh->v[mesh->f[f_id][1]]+mesh->v[mesh->f[f_id][2]])/3.0f);
     slice(render_s->dis);
     con<RenderCtrl>().update();
-}
-
-bool PluginBackend::importMesh(std::string url,std::string name){
-    PickableMesh* mesh =  YbCore::IO::readObj(url);
-    YbCore::calculateNorm(mesh);
-    YbCore::centerlized(mesh);
-    norm = YbCore::pca_analysic(mesh,2);  glm::vec3(0,0,1);//
-    YbCore::sortByVector(mesh, norm);
-    con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
-
-    RenderScript([=](QTime&) {
-        mesh->createBufferScript();
-        mesh->syncVertexBuffersDataScript();
-        mesh->syncFacesBuffersDataScript();
-    });
-
-    render_s->bounding_z[0] = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]);
-    render_s->bounding_z[1] = glm::dot(norm,mesh->v[(*std::prev(mesh->f.end()))[0]]);
-
-    float model_height = glm::dot(norm,mesh->v[(*mesh->f.begin())[0]]-mesh->v[(*std::prev(mesh->f.end()))[0]]);
-    emit heightUpdate(QString::number(model_height,'f',2));
-    for(int i=0; i < mesh->f.size(); i += 10) {
-        gap = std::max(gap, abs(glm::dot(norm,mesh->v[mesh->f[i][0]]-mesh->v[mesh->f[i][1]]))*20);
-    }
-
-    QObject::connect(mesh,&PickableMesh::Selected, mesh, [=](PickableMesh* mesh){
-        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/selections.obj";
-        plugin::writePartialMesh(mesh, con<CentralCtrl>().selectTool->getSelectedFace(), select_file);
-//        auto border_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/borders.obj";
-//        auto border_face = plugin::extractMeshBorder(mesh, con<CentralCtrl>().selectTool->getSelectedFace());
-//        plugin::writePartialMesh(mesh, border_face, border_file);
-    });
-
-    return true;
 }
 
 void PluginBackend::setSliceCanvas(QQuickPaintedItem* item) {

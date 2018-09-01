@@ -1,6 +1,5 @@
 #include "PluginBackend.h"
 #include "ScanRender.h"
-#include <YbCore/mesh_proc>
 
 PluginBackend::PluginBackend()
 {
@@ -13,22 +12,8 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
-    importMesh(PLUGINPATH"GLViewer/mesh/body2.obj","scanbody");
+    importMesh(MESHPATH"bunny.obj","scanbody");
     render_s = new("render") ScanRender;
-}
-
-bool PluginBackend::importMesh(std::string url,std::string name) {
-//    con<MeshCtrl>().mesh("bunny")->visible = false;
-    PickableMesh* mesh = YbCore::IO::readObj(url);
-    YbCore::calculateNorm(mesh);
-    YbCore::centerlized(mesh);
-    con<MeshCtrl>().addMesh(name,mesh); //bunny FullBodyScan 20180205142827.cie
-    RenderScript([=](QTime &t) {
-        mesh->createBufferScript();
-        mesh->syncVertexBuffersDataScript();
-        mesh->syncFacesBuffersDataScript();
-    });
-    return true;
 }
 
 void PluginBackend::draw_for(QString value) {

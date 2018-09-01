@@ -2,7 +2,6 @@
 #include "PluginBackend.h"
 #include <qqml.h>
 #include <YbCore/controller>
-#include <YbCore/mesh_proc>
 
 void MorphPlugin::registerTypes(const char *uri)
 {

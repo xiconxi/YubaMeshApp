@@ -1,12 +1,12 @@
 #include "Pick.h"
-
-#include "../controller/MeshController.h"
 #include "../controller/ViewController.h"
 #include "../controller/ShaderController.h"
+#include "../controller/InteractiveController.h"
 #include <easylogging++.h>
 #include <iostream>
 #include <QSGTextureProvider>
 #include <QOpenGLFramebufferObject>
+#include "../mesh/PickableMesh.h"
 
 PickTool::PickTool():RenderScript(std::bind(&PickTool::drawResult, this, std::placeholders::_1))
 {
@@ -30,14 +30,15 @@ void PickTool::pickScript() {
     shader->bind();
     shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
 
-    for(auto meshKV:con<MeshCtrl>().allMesh()){
-        auto mesh = meshKV.second;
+    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+        auto mesh = objectKV.second;
         if(mesh->visible == false) continue;
         shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
-        shader->setUniformValue("mesh_id",(float)mesh->numericalId());
+        shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();
     }
     shader->release();
+
     gl.glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
     gl.glReadBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -51,6 +52,7 @@ void PickTool::pickScript() {
             if(rgb[0] > -1.0f)
                 visible_picks.push_back({(int)rgb[0],(int)rgb[1]});
     }
+
     gl.glEnable(GL_DITHER);
     gl.glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     gl.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pre_fbo);
@@ -61,11 +63,11 @@ void PickTool::drawResult(QTime& t) {
         gl.glEnable(GL_POLYGON_OFFSET_FILL);
         gl.glPolygonOffset(-1.0,-1.0);
         auto shader = con<ShaderCtrl>().shader("selection",true);
-        auto mesh   = con<MeshCtrl>().mesh(e[0]);
+        auto mesh   = con<InteractiveCtrl>().object(e[0]);
         shader->bind();
         shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
         shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
-        mesh->drawElementBufferScript(e[1], 1);
+        mesh->drawElementScript(e[1], 1);
         shader->release();
         gl.glDisable(GL_POLYGON_OFFSET_FILL);
     }
@@ -117,7 +119,6 @@ int  PickTool::getSingleFacePick(int x, int y){
     pick_lock.unlock();
     clearPicks();
     return  retu;
-
 }
 
 void PickTool::meshPick(int x, int y) {
@@ -125,9 +126,9 @@ void PickTool::meshPick(int x, int y) {
     RenderScript([&](QTime& t){
         pickScript();
         if(visible_picks.size())
-            con<MeshCtrl>().setSelectableMesh(visible_picks[0][0]);
+            con<InteractiveCtrl>().focus(con<InteractiveCtrl>().object(visible_picks[0][0]));
         else
-            con<MeshCtrl>().setSelectableMesh(nullptr);
+            con<InteractiveCtrl>().focus(nullptr);
         clearPicks();
     });
 }

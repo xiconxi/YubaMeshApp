@@ -1,6 +1,6 @@
 #ifndef FORMAT_OBJ_H
 #define FORMAT_OBJ_H
-#include "../type_mesh.h"
+#include "../types/type_mesh.h"
 #include <string>
 namespace YbMesh {
 namespace IO {

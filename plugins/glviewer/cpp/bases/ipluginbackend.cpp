@@ -1,9 +1,8 @@
 #include "./IPluginBackend.h"
 #include "../mesh/PickableMesh.h"
-#include "../mesh/meshProcessing.h"
-#include "../mesh/meshCodes.h"
-#include "../controller/MeshController.h"
 #include "../controller/RenderController.h"
+#include "../controller/InteractiveController.h"
+#include <YbMesh/YbMesh.hpp>
 
 bool IPluginBackend::importMesh(QString url){
     auto str = url.toStdString().substr(7);
@@ -11,18 +10,16 @@ bool IPluginBackend::importMesh(QString url){
 }
 
 bool IPluginBackend::importMesh(std::string url, std::string name) {
-    PickableMesh* mesh = YbCore::IO::readObj(url);
-    YbCore::calculateNorm(mesh);
-    YbCore::centerlized(mesh);
-
+    YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
+    auto object = new InteractiveObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    object->centerlized();
+    object->calculateNorm();
     RenderScript([=](QTime&) {
-        mesh->createBufferScript();
-        mesh->syncVertexBuffersDataScript();
-        mesh->syncFacesBuffersDataScript();
+        object->createBufferScript();
+        object->syncVertexBuffersDataScript();
+        object->syncFacesBuffersDataScript();
     });
-
-    con<MeshCtrl>().addMesh(name, mesh); //bunny FullBodyScan 20180205142827.cie
-
+    con<InteractiveCtrl>().addInteractiveObject(name, object);
     return true;
 }
 

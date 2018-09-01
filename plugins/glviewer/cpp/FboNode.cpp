@@ -1,17 +1,14 @@
 #include "FboNode.h"
 #include "controller/RenderController.h"
 #include "controller/ViewController.h"
-#include "controller/MeshController.h"
 #include "controller/ShaderController.h"
 #include "controller/CentralController.h"
-
-#include "mesh/meshProcessing.h"
-#include "mesh/meshCodes.h"
+#include "controller/InteractiveController.h"
 
 #include "utils/Pick.h"
 #include "utils/Select.h"
 #include "utils/SelectCanvas.h"
-#include "utils/ScriptSamples.h"
+//#include "utils/ScriptSamples.h"
 
 #include <QSGTextureProvider>
 #include <easylogging++.h>
@@ -42,25 +39,12 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
     con<ViewCtrl>().addView("cam",new ViewerMatrix());
 
     // meshCtrl Callback! must initialize
-    con<CentralCtrl>().selectTool = new("selectTool") SelectTool();
-    con<CentralCtrl>().selectTool->createBufferScript();
+    con<InteractiveCtrl>().selectTool = new("selectTool") SelectTool();
+    con<InteractiveCtrl>().selectTool->createBufferScript();
 
-    con<CentralCtrl>().pickTool = new("pickTool") PickTool();
-    con<CentralCtrl>().pickTool->createBufferScript();
+    con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
+    con<InteractiveCtrl>().pickTool->createBufferScript();
 
-#ifdef LOAD_BUNNY
-    auto mesh = YbCore::IO::readObj(MESHPATH"bunny.obj");
-    YbCore::calculateNorm(mesh);
-    YbCore::centerlized(mesh);
-
-    RenderScript([=](QTime&) {
-        mesh->createBufferScript();
-        mesh->syncVertexBuffersDataScript();
-        mesh->syncFacesBuffersDataScript();
-    });
-
-    con<MeshCtrl>().addMesh("bunny",mesh); //bunny FullBodyScan 20180205142827.cie
-#endif
     return ret;
 }
 
@@ -88,12 +72,12 @@ void FboNode::unregisterModule(QString module) {
 }
 
 void FboNode::singleFacePick(int x, int y) {
-    con<CentralCtrl>().pickTool->meshPick(x,y);
+    con<InteractiveCtrl>().pickTool->meshPick(x,y);
     con<RenderCtrl>().update();
 }
 
 void FboNode::screenAreaPick(QQuickPaintedItem *item) {
-    con<CentralCtrl>().selectTool->areasFaceSelect(item);
+    con<InteractiveCtrl>().selectTool->areasFaceSelect(item);
     con<RenderCtrl>().update();
     ((SelectCanvas*)item)->clear();
 }

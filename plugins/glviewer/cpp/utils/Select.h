@@ -39,12 +39,11 @@ private:
     void endStreamQueryScript();
 
     QQuickPaintedItem* areaItem;
-    std::vector<std::array<uint,2> > selections;
 
     GLuint xfb = 0,face_buffer, face_vao;
 
     std::array<uint,2>  queries = {0,0};
-    std::array<int,2>  stream_size;
+    std::array<int,2>  stream_size = {0,0};
 
     uint current_face_buffer_size = 0;
     std::vector<glm::ivec3> selected_faces;

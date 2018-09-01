@@ -7,8 +7,6 @@
 #include <easylogging++.h>
 #include <QQuickFramebufferObject>
 #include "../bases/ISingleton.inc"
-class PickTool;
-class SelectTool;
 
 typedef QOpenGLFunctions_4_1_Core ActiveGL;
 LIBSHARED_EXPORT extern  ActiveGL gl;
@@ -17,7 +15,7 @@ class LIBSHARED_EXPORT CentralCtrl
 {
 public:
     enum RSTYPE{
-        MESH, RENDER, SHADER, VIEW
+        RENDER, SHADER, VIEW
     };
 
     void setModuleName(std::string name);
@@ -34,8 +32,6 @@ public:
 
     void initialGLFunctions();
 
-    SelectTool mutable *selectTool;
-    PickTool mutable *pickTool;
 private:
     CentralCtrl(){}
     friend class ICtrl<CentralCtrl>;

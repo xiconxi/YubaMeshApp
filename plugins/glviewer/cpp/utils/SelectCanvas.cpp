@@ -2,7 +2,6 @@
 #include <easylogging++.h>
 #include <QSGTextureProvider>
 #include "../controller/RenderController.h"
-#include "../controller/MeshController.h"
 #include "../controller/ShaderController.h"
 #include "../controller/ViewController.h"
 

@@ -2,8 +2,8 @@
 #define PICK_H
 #include "../controller/RenderController.h"
 #include <QReadWriteLock>
-
-
+#include <vector>
+#include <array>
 class LIBSHARED_EXPORT PickTool: public RenderScript {
 public:
     PickTool();

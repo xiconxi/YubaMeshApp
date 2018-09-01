@@ -1,9 +1,10 @@
 #include "Select.h"
-#include "../controller/MeshController.h"
 #include "../controller/ViewController.h"
 #include "../controller/ShaderController.h"
+#include "../controller/InteractiveController.h"
 #include <easylogging++.h>
 #include <QSGTextureProvider>
+#include "../mesh/PickableMesh.h"
 
 SelectTool::SelectTool():RenderScript(std::bind(&SelectTool::drawResultSrcipt, this, std::placeholders::_1))
 {
@@ -11,13 +12,14 @@ SelectTool::SelectTool():RenderScript(std::bind(&SelectTool::drawResultSrcipt, t
 }
 
 void SelectTool::clearSelect() {
-    selections.clear();
+    stream_size[0] = 0;
 }
 
 void SelectTool::SelectScript(QTime& t) {
     auto shader = con<ShaderCtrl>().shader("select",true);
     auto view = con<ViewCtrl>().view();
-    auto mesh = con<MeshCtrl>().selectable();
+    auto mesh = con<InteractiveCtrl>().focus();
+    if(mesh == nullptr) return ;
     this->beginStreamQueryScript();
 
     shader->bind();
@@ -39,9 +41,9 @@ void SelectTool::SelectScript(QTime& t) {
 
     this->endStreamQueryScript();
     if(stream_size[0] > 0) {
-        selections = { {(uint)mesh->numericalId(), (uint)stream_size[0] }};
-        this->downloadSelectionsScript();
-        emit mesh->Selected(mesh);
+
+//        this->downloadSelectionsScript();
+//        emit mesh->FaceSelected(mesh);
     }
 }
 
@@ -60,15 +62,15 @@ std::vector<glm::ivec3>& SelectTool::getSelectedFace() {
 }
 
 void SelectTool::drawResultSrcipt(QTime& t) {
-    for(auto& e:selections) {
+    if(stream_size[0] > 0 ) {
         gl.glEnable(GL_POLYGON_OFFSET_FILL);
         gl.glPolygonOffset(-1.0,-1.0);
         auto shader = con<ShaderCtrl>().shader("selection",true);
-        auto mesh   = con<MeshCtrl>().mesh(e[0]);
+        auto mesh = con<InteractiveCtrl>().focus();
         shader->bind();
         shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
         shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
-        mesh->drawElementBufferScript(face_buffer, 0, e[1]);
+        mesh->drawElementBufferScript(face_buffer, 0, stream_size[0]);
         shader->release();
         gl.glDisable(GL_POLYGON_OFFSET_FILL);
     }

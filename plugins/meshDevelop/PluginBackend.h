@@ -11,7 +11,7 @@ public:
     Q_INVOKABLE void construction() override;
     Q_INVOKABLE void draw_for(QString value);
 
-    bool importMesh(std::string url,std::string name) override;
+//    bool importMesh(std::string url,std::string name) override;
 
 private:
     ScanRender* render_s;
