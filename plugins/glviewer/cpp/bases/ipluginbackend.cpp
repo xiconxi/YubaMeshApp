@@ -1,5 +1,5 @@
 #include "./IPluginBackend.h"
-#include "../mesh/PickableMesh.h"
+#include "./InteractiveObjectMesh.h"
 #include "../controller/RenderController.h"
 #include "../controller/InteractiveController.h"
 #include <YbMesh/YbMesh.hpp>

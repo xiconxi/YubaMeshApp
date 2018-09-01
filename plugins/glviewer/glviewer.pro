@@ -20,13 +20,13 @@ SOURCES += \
     cpp/controller/RenderController.cpp \
     cpp/controller/ShaderController.cpp \
     cpp/controller/ViewController.cpp \
-    cpp/mesh/PickableMesh.cpp \
     cpp/utils/Select.cpp \
     cpp/utils/SelectCanvas.cpp \
     cpp/utils/Pick.cpp \
     cpp/utils/ScriptSamples.cpp \
     cpp/bases/IPluginBackend.cpp \
     cpp/bases/IRenderScript.cpp \
+    cpp/bases/InteractiveObjectMesh.cpp
 
 
 
@@ -41,8 +41,6 @@ HEADERS += \
     cpp/controller/RenderController.h \
     cpp/controller/ShaderController.h \
     cpp/controller/ViewController.h \
-#    cpp/mesh/meshProcessing.h \
-    cpp/mesh/PickableMesh.h \
     cpp/utils/Select.h \
     cpp/utils/Pick.h \
     cpp/utils/SelectCanvas.h \
@@ -51,6 +49,7 @@ HEADERS += \
     wrapInclude/YbCore/controller \
     wrapInclude/YbCore/coretool \
     wrapInclude/YbCore/scripts \
+    cpp/bases/InteractiveObjectMesh.h
 
 
 

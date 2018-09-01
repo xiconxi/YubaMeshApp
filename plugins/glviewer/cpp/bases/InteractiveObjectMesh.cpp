@@ -1,4 +1,4 @@
-#include "PickableMesh.h"
+#include "InteractiveObjectMesh.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <QOpenGLFunctions_4_0_Core>
 #include <easylogging++.h>

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <QSGTextureProvider>
 #include <QOpenGLFramebufferObject>
-#include "../mesh/PickableMesh.h"
+#include "../bases/InteractiveObjectMesh.h"
 
 PickTool::PickTool():RenderScript(std::bind(&PickTool::drawResult, this, std::placeholders::_1))
 {
