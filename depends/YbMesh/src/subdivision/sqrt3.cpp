@@ -68,10 +68,12 @@ void YbMesh::sqrt3_subdivision(YbMesh::SharedHalfEdge& heMesh) {
             auto cb = ac->next(), da = bd->next();
 
             // 筛除无法翻转的情况( sin(<AC,AD>) < 0 || sin(<BC,BD>) < 0 )
-            float dotv = glm::dot(glm::normalize(glm::cross(ba->to()->v - ac->to()->v,ba->to()->v - bd->to()->v)),
-                                  glm::normalize(glm::cross(ab->to()->v - ac->to()->v,ab->to()->v - bd->to()->v)) );
-            if( dotv > 0)
-                continue;
+            auto _ab = ab->vector(), _ad = -da->vector(), _ac = ac->vector();
+            auto _bd = bd->vector(), _bc = -cb->vector();
+            if( std::acosf(glm::dot(_ab,_ad)/(glm::length(_ab)*glm::length(_ad))) +
+                    std::acosf(glm::dot(_ab,_ac)/(glm::length(_ab)*glm::length(_ac))) > 1.57079f) continue;
+            if( std::acosf(glm::dot(-_ab,_bd)/(glm::length(-_ab)*glm::length(_bd))) +
+                    std::acosf(glm::dot(-_ab,_bc)/(glm::length(-_ab)*glm::length(_bc))) > 1.57079f) continue;
 
             auto cd = ab, dc = ba;
             cd->_to = bd->_to; dc->_to = ac->_to;
@@ -90,9 +92,9 @@ void YbMesh::sqrt3_subdivision(YbMesh::SharedHalfEdge& heMesh) {
             v.second++;
             if(curr->pair() == edges.end()) break;
             curr = curr->pair()->next();
-            if(v.second > 30) exit(-1);
         }while(it != curr);
-        vs1[i] = verts[i].v*0.4f+v.first*(0.6f/v.second); //
+        float alpha = 1.0f/v.second;
+        vs1[i] = verts[i].v*(1.0f-alpha)+v.first*(alpha/v.second); //
     }
     for(int i = 0; i < vs1.size(); i++)  verts[i].v = vs1[i];
 }

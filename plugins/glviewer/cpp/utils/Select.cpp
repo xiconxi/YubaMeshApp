@@ -4,8 +4,7 @@
 #include "../controller/InteractiveController.h"
 #include <easylogging++.h>
 #include <QSGTextureProvider>
-#include "../mesh/PickableMesh.h"
-
+#include "../bases/InteractiveObjectMesh.h"
 SelectTool::SelectTool():RenderScript(std::bind(&SelectTool::drawResultSrcipt, this, std::placeholders::_1))
 {
 

@@ -49,18 +49,24 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
 }
 
 void FboNode::move(int x, int y) {
+    con<RenderCtrl>().render_lock.lockForRead();
     con<ViewCtrl>().view()->move(x, y);
     con<RenderCtrl>().update();
+    con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::rotate(int x, int y) {
+    con<RenderCtrl>().render_lock.lockForRead();
     con<ViewCtrl>().view()->rotate(x, y);
     con<RenderCtrl>().update();
+    con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::scaleBy(float s) {
+    con<RenderCtrl>().render_lock.lockForRead();
     con<ViewCtrl>().view()->scaleBy(s);
     con<RenderCtrl>().update();
+    con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::registerModule(QString module) {

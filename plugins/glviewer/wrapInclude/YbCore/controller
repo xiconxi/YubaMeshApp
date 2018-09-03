@@ -13,6 +13,6 @@
 //extern template ViewCtrl  & con();
 
 #include "../cpp/bases/IPluginBackend.h"
-#include "../cpp/mesh/PickableMesh.h"
+#include "../cpp/bases/InteractiveObjectMesh.h"
 
 #endif // CONTROLLER_H

@@ -54,7 +54,7 @@ void RenderCtrl::render() {
     QQuickFramebufferObject::Renderer::update();
     if(!this->render_volatile) return ;
 
-    render_lock.lockForRead();
+    render_lock.lockForWrite();
 
     anonymouse_lock.lockForRead();
     for(auto& e:this->anonymous_script) {

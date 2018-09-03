@@ -26,6 +26,8 @@ public:
 
     const QOpenGLFramebufferObject& frameBufferObject() const;
 
+    QReadWriteLock render_lock;
+
 private:
 
     void addScript(RenderScript&& op);
@@ -50,7 +52,6 @@ private:
     QReadWriteLock named_lock;
     QReadWriteLock anonymouse_lock;
 
-    QReadWriteLock render_lock;
     volatile bool for_next_frame = false;
     volatile bool render_volatile = false;
 
@@ -61,7 +62,7 @@ template <typename T>
 class  CriticalProperty{
 public:
     void set(T&& value){
-        con<RenderCtrl>().render_lock.lockForWrite();
+        con<RenderCtrl>().render_lock.lockForRead();
         property = value;
         con<RenderCtrl>().render_lock.unlock();
     }

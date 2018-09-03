@@ -1,6 +1,5 @@
 #include "InteractiveController.h"
 #include <string>
-#include "../mesh/PickableMesh.h"
 #include "../utils/Select.h"
 template<>
 LIBSHARED_EXPORT InteractiveCtrl& con<InteractiveCtrl>(){

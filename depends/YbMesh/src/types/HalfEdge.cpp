@@ -108,4 +108,12 @@ VertIt IHalfEdge::to() {
     return SharedHalfEdge::ptr->verts.begin()+_to;
 }
 
+VertIt IHalfEdge::from() {
+    return SharedHalfEdge::ptr->verts.begin()+_from;
+}
+
+glm::vec3 IHalfEdge::vector() {
+    return to()->v - from()->v;
+}
+
 }

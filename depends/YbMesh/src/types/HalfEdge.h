@@ -51,10 +51,12 @@ struct IHalfEdge{
     IHalfEdgeIt next();
     IHalfEdgeIt pair();
     VertIt to();
-
+    VertIt from();
+    glm::vec3 vector();
     int _next, _pair, _face, _to;
+
 private:
-    int _from; // only used for caclulate _pair
+    int _from; // mostly used for caclulate _pair
     friend class SharedHalfEdge;
 };
 
