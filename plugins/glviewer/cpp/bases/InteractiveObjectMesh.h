@@ -39,7 +39,7 @@ public:
     YbMesh::indicesTriMesh<glm::vec3> m_v;
     YbMesh::indicesTriMesh<glm::vec3> m_n;
 
-private:
+protected:
     uint vao, ibo, v_buffer;
 };
 class SelectTool;
@@ -50,11 +50,14 @@ public:
     void createBufferScript() override;
     void syncSelectBufferScript();
     ~InteractiveObject();
+    const std::vector<glm::ivec3>& selectedFaces();
 signals:
-    void FaceSelected(IDrawObject* object);
+    void FaceSelected(InteractiveObject* object);
 private:
+    void downloadSelectedBufferScript(int buffer_size);
     friend class SelectTool;
-    uint selected_buffer, selected_faces = 0;
+    uint selected_buffer = 0;
+    std::vector<glm::ivec3> selected_faces;
 };
 
 #endif // PICKABLEMESH_H

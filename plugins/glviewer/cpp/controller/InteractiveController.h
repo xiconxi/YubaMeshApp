@@ -4,10 +4,12 @@
 #include "../bases/ISingleton.inc"
 #include <vector>
 #include <map>
+#include <glm/vec3.hpp>
 
 class PickTool;
 class SelectTool;
 class InteractiveObject;
+class IDrawObject;
 
 class InteractiveCtrl
 {
@@ -16,22 +18,25 @@ public:
     SelectTool mutable *selectTool;
     PickTool mutable *pickTool;
 
-    void addInteractiveObject(std::string name,InteractiveObject* object);
-    void delInteractiveObject(InteractiveObject* object);
-    InteractiveObject* object(std::string name);
-    InteractiveObject* object(uint id);
+    void addInteractiveObject(std::string name,IDrawObject* object);
+    void delInteractiveObject(IDrawObject* object);
+    IDrawObject* object(std::string name);
+    IDrawObject* object(uint id);
+
+    InteractiveObject* interactiveObject(std::string name);
+    InteractiveObject* interactiveObject(uint id);
 
     void focus(InteractiveObject* object);
     void focus(uint id);
     InteractiveObject* focus();
-    std::map<uint,InteractiveObject*>& allObjects();
+    std::map<uint,IDrawObject*>& allObjects();
 
 private:
     uint queryInteractiveId();
     friend class ICtrl<InteractiveCtrl>;
     uint interactive_cnts = 0;
     std::map<std::string,uint> name2id;
-    std::map<uint,InteractiveObject*> objects;
+    std::map<uint,IDrawObject*> objects;
     InteractiveObject* focus_object = nullptr;
 };
 

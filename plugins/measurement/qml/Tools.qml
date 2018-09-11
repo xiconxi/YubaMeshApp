@@ -19,9 +19,49 @@ Item {
                 SubBackends.workMode("scan")
             }
         }
-        Button{text: "test*"}
-        Button{text: "test*"}
         spacing: 10
+    }
+
+    GridView {
+        id: measureValues
+        width: 100;
+        height: cellHeight*count
+        y: 200
+        anchors.horizontalCenter: parent.horizontalCenter
+        cellWidth: 100; cellHeight: 30
+
+        model:ListModel{
+            id: msModel
+            property real ms_index
+            ListElement{name: "身高";value: ""}
+            ListElement{name: "胸围";value: ""}
+            ListElement{name: "腰围";value: ""}
+            ListElement{name: "臀围";value: ""}
+            ListElement{name: "会阴高";value: ""}
+        }
+        property var textField
+
+        delegate: Row{
+            Text{
+                width: measureValues.cellWidth*0.4
+                text: name + ":"
+            }
+            TextField{
+                id: itemValue
+                width: measureValues.cellWidth*0.6
+                text: value
+                onFocusChanged: {
+                    if(focus) msModel.ms_index = model.index
+                }
+
+                Connections{
+                    target: SubBackends
+                    onMeasureValueUpdate:
+                        msModel.setProperty(valueId, "value", ms_value)
+                }
+            }
+        }
+        focus: true
     }
 
     Connections{
@@ -35,21 +75,6 @@ Item {
 
     Text {
         anchors.top: parent.top
-        anchors.topMargin: 30
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: "white"
-        text: "身高: "
-        id: heightLable
-        Connections{
-            target: SubBackends
-            onHeightUpdate:{
-                heightLable.text = "身高: "+ heightValue
-            }
-        }
-    }
-
-    Text {
-        anchors.top: parent.top
         anchors.topMargin: 60
         anchors.horizontalCenter: parent.horizontalCenter
         color: "white"
@@ -57,8 +82,12 @@ Item {
         id: girthLable
         Connections{
             target: SubBackends
+            enabled: msModel.ms_index >= 1 && msModel.ms_index <= 3
             onSliceUpdate:{
                 girthLable.text = "周长: "+ sliceValue
+                if(msModel.ms_index >= 1) {
+                    msModel.setProperty(msModel.ms_index, "value", sliceValue)
+                }
             }
         }
     }

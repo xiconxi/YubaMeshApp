@@ -10,6 +10,8 @@ namespace IO {
     void exportObj(indicesTriMesh<glm::vec3>& mesh, std::string file);
 
     void exportObj(indicesTriMesh<glm::vec2>& mesh, std::string file);
+
+    void writePartialMesh(indicesTriMesh<glm::vec3>& mesh,const std::vector<glm::ivec3> &faces, std::string file_name);
 }
 }
 

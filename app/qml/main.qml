@@ -117,7 +117,7 @@ YubaWindow {
         anchors.top: parent.top
         anchors.topMargin: 20
         anchors.bottom: parent.bottom
-        width: 180
+        width: 200
         color: '#909294'
         property var subView
     }

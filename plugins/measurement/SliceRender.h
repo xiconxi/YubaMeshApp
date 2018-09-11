@@ -18,7 +18,7 @@ public:
 
     glm::vec2 bounding_z;
 
-    float percent = 0;
+    float percent = 0.3;
 
 private:
     void scanLineAnimation(QTime& t);

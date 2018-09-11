@@ -11,17 +11,13 @@ INCLUDEPATH += \
 # Input
 SOURCES += \
     measurement_plugin.cpp \
-#    measurement_backend.cpp \
     SlicesCanvas.cpp \
-    algorithm/MeshProcessing.cpp \
     PluginBackend.cpp \
     SliceRender.cpp
 
 HEADERS += \
     measurement_plugin.h \
-#    measurement_backend.h \
     SlicesCanvas.h \
-    algorithm/MeshProcessing.h \
     PluginBackend.h \
     SliceRender.h
 

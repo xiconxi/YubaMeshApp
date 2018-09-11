@@ -32,7 +32,7 @@ private:
 
     void drawResultSrcipt(QTime& t);
 
-    void downloadSelectionsScript();
+    std::vector<glm::ivec3> downloadSelectionsScript(InteractiveObject* object);
 
     void beginStreamQueryScript();
 
@@ -44,8 +44,6 @@ private:
 
     std::array<uint,2>  queries = {0,0};
     std::array<int,2>  stream_size = {0,0};
-
-    std::vector<glm::ivec3> selected_faces;
 
     QReadWriteLock select_lock;
 };

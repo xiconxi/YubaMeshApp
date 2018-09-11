@@ -31,16 +31,12 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-
-# Copy the qmldir file to the same folder as the plugin binary
-cpPluginsConfig.files += ../plugins/pluginsConfig.xml
-cpPluginsConfig.path = $$DESTDIR
+DISTFILES += ../plugins/pluginsConfig.xml
 
 cpmeshes.files += mesh/*
 cpmeshes.path = $$DESTDIR/Mesh
 
-COPIES += cpPluginsConfig \
-            cpmeshes
+COPIES += cpmeshes
 
 HEADERS += \
     gl4window.h
@@ -52,10 +48,10 @@ osx {
     }CONFIG(debug,debug|release){
         suffix = _debug
     }
-    for(libname, $$list(GLViewer Measurement)) { # Measurement MeshDevelop
+    for(libname, $$list(GLViewer Measurement MeshDevelop)) { # Measurement MeshDevelop
         qtmodules.files += $$OUT_PWD/../modules/$${libname}$${suffix}
     }
-    qtmodules.files += $$PWD/../plugins/pluginsConfig.xml
+    qtmodules.files += ../plugins/pluginsConfig.xml
     qtmodules.path = Contents/PlugIns
     QMAKE_BUNDLE_DATA += qtmodules
 

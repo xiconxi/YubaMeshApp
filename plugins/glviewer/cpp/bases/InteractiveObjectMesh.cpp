@@ -88,3 +88,17 @@ void InteractiveObject::syncSelectBufferScript() {
 InteractiveObject::~InteractiveObject(){
 
 }
+
+void InteractiveObject::downloadSelectedBufferScript(int buffer_size) {
+    selected_faces.resize(buffer_size);
+    gl.glBindBuffer(GL_COPY_READ_BUFFER, selected_buffer);
+    const void *data = gl.glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
+    if (data)
+        memcpy(selected_faces.data(), data, selected_faces.size() * sizeof(selected_faces[0]));
+    gl.glUnmapBuffer(GL_COPY_READ_BUFFER);
+    gl.glBindBuffer(GL_COPY_READ_BUFFER, 0);
+}
+
+const std::vector<glm::ivec3>& InteractiveObject::selectedFaces() {
+    return selected_faces;
+}

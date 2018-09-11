@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <easylogging++.h>
+#include <numeric>
 void YbMesh::slice::sortByVector(indicesTriMesh<glm::vec3> &mesh, glm::vec3 x) {
     auto& v = mesh.v();
     std::sort(mesh.f().begin(), mesh.f().end(), [=](glm::ivec3& e1, glm::ivec3& e2){
@@ -11,14 +12,19 @@ void YbMesh::slice::sortByVector(indicesTriMesh<glm::vec3> &mesh, glm::vec3 x) {
     });
 }
 
-glm::mat3 YbMesh::slice::pca_analysic(indicesTriMesh<glm::vec3> &mesh, uint r_id) {
-    std::array<glm::vec3, 3> pca_vs;
-    auto& vs = mesh.v();
-    Eigen::MatrixXf X(vs.size(), 3), XX(3,3), vec, val;
+glm::mat3 YbMesh::slice::pca_analysic(std::vector<glm::vec3>& vs,
+                                      std::vector<glm::ivec3>::iterator begin,
+                                      std::vector<glm::ivec3>::iterator end) {
+    std::vector<bool> v_flag(vs.size(), false);
+    for(auto it = begin; it != end; it++)
+        v_flag[it->r] = v_flag[it->g] = v_flag[it->b] = true;
 
-    for(size_t i = 0; i < vs.size(); i++) {
-        auto& v = vs[i];
-        X(i,0) = v[0]; X(i,1) = v[1]; X(i,2) = v[2];
+    Eigen::MatrixXf X( std::accumulate(v_flag.begin(), v_flag.end(), 0,[](int s,const bool & e){ return s+e;}), 3);
+    Eigen::MatrixXf XX(3,3), vec, val;
+
+    for(int i = 0, j = 0; i < v_flag.size(); i++) {
+        if(v_flag[i] == false) continue;
+        X(j,0) = vs[i][0];X(j,1) = vs[i][1];X(j++,2) = vs[i][2];
     }
 
     //normalize
@@ -83,4 +89,22 @@ std::array<std::vector<glm::ivec3>::iterator,2> YbMesh::slice::getSliceInterval(
 
     if(result[0] > result[1]) std::swap(result[0],result[1]);
     return result;
+}
+
+std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> YbMesh::slice::_RFF::sortContours(std::vector<std::array<glm::vec3,2>>&& intersections) {
+    std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> intervals = {{intersections.begin(),intersections.begin()}};
+    for(auto it = intersections.begin(); it != intersections.end(); it++) {
+        auto find_it = std::find_if(std::next(it), intersections.end(), [=](std::array<glm::vec3,2>& e){
+            return  (e[0][0] == (*it)[1][1] && e[0][1] == (*it)[1][0]) || (e[0][0] == (*it)[0][1] && e[0][1] == (*it)[0][0])
+                    ||(e[1][0] == (*it)[0][1] && e[1][1] == (*it)[0][0]) || (e[1][0] == (*it)[1][1] && e[1][1] == (*it)[1][0]);
+        });
+        if(find_it != intersections.end()) {
+            std::swap(*std::next(it),*find_it);
+        }else{
+            (*std::prev(intervals.end()))[1] = std::next(it);
+            if(it != std::prev(intersections.end()))
+                intervals.push_back({std::next(it),std::next(it)});
+        }
+    }
+    return intervals;
 }

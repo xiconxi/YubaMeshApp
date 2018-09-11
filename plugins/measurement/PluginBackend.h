@@ -21,7 +21,7 @@ public:
 
     Q_INVOKABLE void workMode(QString mode);
 
-    void slice(float dis);
+    float slice(float dis);
 
     bool importMesh(std::string url,std::string name) override;
 
@@ -30,6 +30,8 @@ public:
     Q_INVOKABLE void destruction() override;
 
     Q_INVOKABLE void setSliceCanvas(QQuickPaintedItem* item);
+
+    Q_INVOKABLE float sliceInRatio(float ratio);
 
     std::vector<std::vector<QPoint>> contours;
 
@@ -41,10 +43,10 @@ public:
 
 signals:
     void sliceUpdate(QString sliceValue);
-    void heightUpdate(QString heightValue);
-
+    void measureValueUpdate(int valueId, QString ms_value);
 private:
-    void test(std::vector<std::complex<float> >& );
+    void defaultSlice(int id, float ratio);
+    void test(std::vector<std::complex<float> >&  timevec);
     SliceRender* render_s;
 };
 

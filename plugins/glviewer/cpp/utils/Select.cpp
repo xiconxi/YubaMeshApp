@@ -20,8 +20,8 @@ void SelectTool::SelectScript(QTime& t) {
     shader->bind();
     shader->setUniformValue("camera_vp", view->MatrixVP());
     for(auto objectKV:con<InteractiveCtrl>().allObjects()){
-        auto mesh = objectKV.second;
-        if(mesh->visible == false) continue;
+        auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
+        if(mesh == nullptr || mesh->visible == false) continue;
         this->beginStreamQueryScript();
 
         shader->setUniformValue("model", view->Model()*mesh->Model());
@@ -39,23 +39,11 @@ void SelectTool::SelectScript(QTime& t) {
         gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
         this->endStreamQueryScript();
-        mesh->selected_faces = stream_size[0] > 0? stream_size[0]:0;
+        mesh->downloadSelectedBufferScript(stream_size[0]);
+        if(stream_size[0] > 0)
+            emit mesh->FaceSelected(mesh);
     }
     shader->release();
-}
-
-void SelectTool::downloadSelectionsScript() {
-//    selected_faces.resize(stream_size[0]);
-//    gl.glBindBuffer(GL_COPY_READ_BUFFER, face_buffer);
-//    const void *data = gl.glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
-//    if (data)
-//        memcpy(selected_faces.data(), data, selected_faces.size() * sizeof(selected_faces[0]));
-//    gl.glUnmapBuffer(GL_COPY_READ_BUFFER);
-//    gl.glBindBuffer(GL_COPY_READ_BUFFER, 0);
-}
-
-std::vector<glm::ivec3>& SelectTool::getSelectedFace() {
-    return selected_faces;
 }
 
 void SelectTool::drawResultSrcipt(QTime& t) {
@@ -66,10 +54,10 @@ void SelectTool::drawResultSrcipt(QTime& t) {
     gl.glEnable(GL_POLYGON_OFFSET_FILL);
     gl.glPolygonOffset(-1.0,-1.0);
     for(auto objectKV:con<InteractiveCtrl>().allObjects()){
-        auto mesh = objectKV.second;
-        if(mesh->selected_faces == 0) continue;
+        auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
+        if(mesh == nullptr || mesh->selected_faces.size() == 0) continue;
         shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
-        mesh->drawElementBufferScript(mesh->selected_buffer,0,mesh->selected_faces);
+        mesh->drawElementBufferScript(mesh->selected_buffer,0,mesh->selected_faces.size());
     }
     shader->release();
     gl.glDisable(GL_POLYGON_OFFSET_FILL);

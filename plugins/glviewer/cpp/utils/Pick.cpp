@@ -126,7 +126,7 @@ void PickTool::meshPick(int x, int y) {
     RenderScript([&](QTime& t){
         pickScript();
         if(visible_picks.size())
-            con<InteractiveCtrl>().focus(con<InteractiveCtrl>().object(visible_picks[0][0]));
+            con<InteractiveCtrl>().focus(con<InteractiveCtrl>().interactiveObject(visible_picks[0][0]));
         else
             con<InteractiveCtrl>().focus(nullptr);
         clearPicks();

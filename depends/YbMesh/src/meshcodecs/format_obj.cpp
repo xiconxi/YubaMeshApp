@@ -133,3 +133,19 @@ void YbMesh::IO::exportObj(indicesTriMesh<glm::vec2>& mesh, std::string filename
     prefix(file, "f") << mesh.f();
     file.close();
 }
+
+void YbMesh::IO::writePartialMesh(indicesTriMesh<glm::vec3>& mesh,const std::vector<glm::ivec3> &faces, std::string file_name) {
+    std::map<int,int> v_rank;
+    std::fstream fileHandle;
+    fileHandle.open(file_name,std::ofstream::out);
+    for(auto it = faces.begin(); it != faces.end(); it++) {
+        for(auto& i:{0,1,2}){
+            if(v_rank.count((*it)[i])) continue;
+            auto& v = mesh.v()[(*it)[i]];
+            v_rank[(*it)[i]] = v_rank.size()+1;
+            fileHandle << "v " << v[0] << ' ' << v[1] << ' ' << v[2] << std::endl;
+        }
+        fileHandle << "f " << v_rank[(*it)[0]] << ' ' << v_rank[(*it)[1]] << ' ' << v_rank[(*it)[2]] << std::endl;
+    }
+    fileHandle.close();
+}
