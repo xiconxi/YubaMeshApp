@@ -29,9 +29,15 @@ glm::mat4 YbMesh::visualization::centerlized(indicesTriMesh<glm::vec3>& vMesh){
     glm::vec3 center = std::accumulate(v.begin(), v.end(), glm::vec3(0),[=](glm::vec3 acc,glm::vec3& e){
         return acc+e;
     })/(float)v.size();
-    float scale_k = std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [=](float s, glm::vec3& e){
-        return std::max<float>(s,glm::length(e-center)* glm::length(e-center));
-    })); // /(float)_v.size())
+//    float scale_k = std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [=](float s, glm::vec3& e){
+//        return std::max<float>(s,glm::length(e-center)* glm::length(e-center));
+//    })); // /(float)_v.size())
 
-    return  glm::scale(glm::mat4(), glm::vec3(1.4 / scale_k))*glm::translate(glm::mat4(), -center);
+//    return  glm::scale(glm::mat4(), glm::vec3(1.4 / scale_k))*glm::translate(glm::mat4(), -center);
+    for(auto& e:v) e -= center;
+    float scale_k = std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [=](float s, glm::vec3& e){
+        return std::max<float>(s,std::powf(glm::length(e),2) );
+    }));
+
+    return  glm::scale(glm::mat4(), glm::vec3(1.4 / scale_k));
 }

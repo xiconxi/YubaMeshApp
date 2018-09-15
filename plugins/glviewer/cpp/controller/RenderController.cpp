@@ -7,6 +7,7 @@
 #include <QImage>
 #include "../FboNode.h"
 #include "../utils/Pick.h"
+#include "../utils/ScriptSamples.h"
 
 template<>
 LIBSHARED_EXPORT RenderCtrl& con<RenderCtrl>(){
@@ -55,6 +56,7 @@ void RenderCtrl::render() {
     if(!this->render_volatile) return ;
 
     render_lock.lockForWrite();
+    YbCore::defaultScript::clear(curr_time);
 
     anonymouse_lock.lockForRead();
     for(auto& e:this->anonymous_script) {

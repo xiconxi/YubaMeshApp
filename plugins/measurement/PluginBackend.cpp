@@ -30,10 +30,10 @@ void PluginBackend::construction() {
     render_s = new("base") SliceRender();
     this->importMesh(MESHPATH"body2.obj","scanbody");
 
-//    defaultSlice(1,0.72f);
-//    defaultSlice(2,0.61f);
-//    defaultSlice(3,0.58f);
-//    defaultSlice(4,0.47f);
+    emit measureValueUpdate(1,QString::number(sliceInRatio(0.72f),'f',2));
+    emit measureValueUpdate(2,QString::number(sliceInRatio(0.61f),'f',2));
+    emit measureValueUpdate(3,QString::number(sliceInRatio(0.58f),'f',2));
+    emit measureValueUpdate(4,QString::number(sliceInRatio(0.47f),'f',2));
 }
 
 float PluginBackend::sliceInRatio(float ratio) {
@@ -61,10 +61,6 @@ float PluginBackend::sliceInRatio(float ratio) {
         }
     }
     return *std::max_element(girths.begin(),girths.end());
-}
-
-void PluginBackend::defaultSlice(int id, float ratio) {
-    emit measureValueUpdate(id,QString::number(sliceInRatio(ratio),'f',2));
 }
 
 void PluginBackend::destruction() {

@@ -45,7 +45,6 @@ signals:
     void sliceUpdate(QString sliceValue);
     void measureValueUpdate(int valueId, QString ms_value);
 private:
-    void defaultSlice(int id, float ratio);
     void test(std::vector<std::complex<float> >&  timevec);
     SliceRender* render_s;
 };

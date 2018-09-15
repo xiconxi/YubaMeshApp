@@ -1,7 +1,7 @@
 #include "PluginBackend.h"
 #include "ScanRender.h"
 #include <QStandardPaths>
-
+#define PI 3.1415926f
 PluginBackend::PluginBackend()
 {
 
@@ -33,9 +33,41 @@ void VertexClusterMeshObject::syncVertexBuffersDataScript() {
 
 VertexClusterMeshObject::VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh)
     :IDrawObject(vmesh,nmesh),vertex_cluster(vmesh.v().size(),0){
-//    int strip = vertex_cluster.size()/12;
-//    for(int i = 0; i < 12; i++)
-//        std::fill(vertex_cluster.begin() + i*strip, vertex_cluster.begin() + (i+1)*strip, i);
+}
+
+void coord_test(float height, float r) {
+    auto triMesh = YbMesh::geometry::make_axes(height,r);
+
+    LOG(INFO) << triMesh.v().size() << ' ' << triMesh.f().size();
+    auto object = new IDrawObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    object->centerlized();
+    object->calculateNorm();
+    RenderScript([=](QTime&) {
+        object->createBufferScript();
+        object->syncVertexBuffersDataScript();
+        object->syncFacesBuffersDataScript();
+    });
+    con<InteractiveCtrl>().addInteractiveObject("coord", object);
+
+    new("z_coord") RenderScript([=](QTime&) {
+        auto shader = con<ShaderCtrl>().shader("core",true);
+        auto view = con<ViewCtrl>().view();
+        auto object = con<InteractiveCtrl>().object("coord");
+        if(object->visible == false) return;
+        int axes = object->m_v.f().size()/3;
+        shader->bind();
+        shader->setUniformValue("camera_vp", view->MatrixVP());
+        shader->setUniformValue("model", view->Model()*object->Model());
+        shader->setUniformValue("base_color", 1.0f, 0.0f, 0.0f);
+        object->drawElementScript(0,axes);
+        shader->setUniformValue("base_color", 0.0f, 1.0f, 0.0f);
+        object->drawElementScript(axes,axes);
+        shader->setUniformValue("base_color", 0.0f, 0.0f, 1.0f);
+        object->drawElementScript(2*axes,axes);
+        shader->release();
+    });
+//    auto cylinder_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/cylinder.obj";
+//    YbMesh::IO::writePartialMesh(object->m_v, *f, cylinder_file);
 }
 
 void PluginBackend::construction() {
@@ -44,16 +76,17 @@ void PluginBackend::construction() {
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
+//    coord_test(10.0f, 0.1f);
 //    importMesh(MESHPATH"bunny.obj","bunny");
     importMesh(MESHPATH"body2.obj","body2");
     render_s = new("render") ScanRender;
-    auto object = con<InteractiveCtrl>().interactiveObject("body2");
-    if(object == nullptr) return;
-    QObject::connect(object,&InteractiveObject::FaceSelected, object, [=](InteractiveObject* mesh){
-        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/body2_selections.obj";
-        LOG(INFO) << select_file;
-        YbMesh::IO::writePartialMesh(mesh->m_v, mesh->selectedFaces(), select_file);
-    });
+//    auto object = con<InteractiveCtrl>().interactiveObject("body2");
+//    if(object == nullptr) return;
+//    QObject::connect(object,&InteractiveObject::FaceSelected, object, [=](InteractiveObject* mesh){
+//        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/body2_selections.obj";
+//        LOG(INFO) << select_file;
+//        YbMesh::IO::writePartialMesh(mesh->m_v, mesh->selectedFaces(), select_file);
+//    });
 }
 
 void PluginBackend::draw_for(QString value) {
@@ -65,33 +98,55 @@ bool PluginBackend::importMesh(std::string url,std::string name){
     auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
     object->centerlized();
     object->calculateNorm();
-    glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
-    YbMesh::slice::sortByVector(triMesh, pca[2]);
-    std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
+    if(true)/*分段*/{
+        glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
+        YbMesh::slice::sortByVector(triMesh, pca[2]);
+        std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
 
+        std::vector<float> z_dots(triMesh.v().size());
+        for(int i = 0; i < triMesh.v().size(); i++)
+            z_dots[i] = glm::dot(triMesh.v()[i], pca[2]);
 
-    std::vector<std::array<float,2>> intervals = {
-        {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)},
-        {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)},
-        {glm::mix(Z[0],Z[1],0.42),glm::mix(Z[0],Z[1],0.74)},
-        {glm::mix(Z[0],Z[1],0.00),glm::mix(Z[0],Z[1],0.42)},
-    };
-    for(auto it = intervals.begin(); it != intervals.end(); it++) {
+        double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0,
+                        [=](double acc,glm::vec3& e){
+                            return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);
+                                                 })/triMesh.v().size());
+
+        std::vector<std::array<float,2>> intervals = {
+            {glm::mix(Z[0],Z[1],0.00),glm::mix(Z[0],Z[1],0.42)}, // 腿
+            {glm::mix(Z[0],Z[1],0.42),glm::mix(Z[0],Z[1],0.74)}, // 躯干
+            {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)}, // 肩膀
+            {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头
+        };
         for(int i = 0; i < triMesh.v().size(); i++) {
-            float v = glm::dot(triMesh.v()[i], pca[2]);
-            if(v >= (*it)[0] && v <= (*it)[1])
-                object->vertex_cluster[i] = it - intervals.begin() ;
+            if(z_dots[i] >= (*intervals.begin())[0] && z_dots[i] <= (*intervals.begin())[1]) {
+                object->vertex_cluster[i] = glm::dot(triMesh.v()[i], pca[1]) > 0? 2:1 ;
+            }else {
+                if( glm::length(triMesh.v()[i]-pca[2]*z_dots[i] ) > mean_dis )
+                    object->vertex_cluster[i] = 3;
+                else for(auto it = intervals.begin() + 1; it != intervals.end(); it++) {
+                    if(z_dots[i] >= (*it)[0] && z_dots[i] <= (*it)[1]) {
+                        object->vertex_cluster[i] = 4 + it - intervals.begin() ;
+                    }
+                }
+            }
         }
-    }
-    for(int i = 0; i < triMesh.v().size(); i++) {
-        if(object->vertex_cluster[i] == 3) {
-            if(glm::dot(triMesh.v()[i], pca[1]) > 0)
-                object->vertex_cluster[i]++ ;
-        }
+//        double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0,
+//                        [=](double acc,glm::vec3& e){
+//                            return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);
+//                                                 })/triMesh.v().size());
+//        for(int i = 0; i < triMesh.v().size(); i++) {
+//            if(object->vertex_cluster[i] == 2) {
+//                if( glm::length(triMesh.v()[i]-pca[2]*z_dots[i] ) > scale )
+//                    object->vertex_cluster[i] += 3;
+//            }
+//        }
 
+
+
+        glm::mat4 coord = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca));
+        object->model = coord * object->model;
     }
-    glm::mat4 coord = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca));
-    object->model = coord * object->model;
     RenderScript([=](QTime&) {
         object->createBufferScript();
         object->syncVertexBuffersDataScript();
