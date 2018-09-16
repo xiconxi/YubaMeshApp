@@ -60,5 +60,9 @@ wireframe
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/slices.gif)
 
+人体部件分割
+
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/components.gif)
+
 
 

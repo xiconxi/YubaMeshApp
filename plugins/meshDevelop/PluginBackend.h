@@ -7,7 +7,7 @@ class ScanRender;
 
 class VertexClusterMeshObject: public IDrawObject {
 public:
-    VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh);
+    VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh,int components);
     // GL functions
     void syncVertexBuffersDataScript() override;
 
@@ -16,9 +16,11 @@ public:
 
 class PluginBackend : public IPluginBackend
 {
+    Q_OBJECT
 public:
     PluginBackend();
     Q_INVOKABLE void construction() override;
+    Q_INVOKABLE void checkComponents(int id, bool status);
     Q_INVOKABLE void draw_for(QString value);
 
     bool importMesh(std::string url,std::string name) override;

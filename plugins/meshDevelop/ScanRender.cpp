@@ -18,7 +18,7 @@ void ScanRender::draw(QTime &t) {
         if(mesh->visible == false) continue;
         if(dynamic_cast<VertexClusterMeshObject*>(mesh) == nullptr) continue;
         shader->setUniformValue("model", view->Model()*mesh->Model());
-        mesh->drawElementScript();
+        mesh->multiDrawElementScript();
     }
     shader->release();
 }

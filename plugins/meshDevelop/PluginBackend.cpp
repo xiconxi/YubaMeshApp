@@ -31,8 +31,8 @@ void VertexClusterMeshObject::syncVertexBuffersDataScript() {
     gl.glBindVertexArray(0);
 }
 
-VertexClusterMeshObject::VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh)
-    :IDrawObject(vmesh,nmesh),vertex_cluster(vmesh.v().size(),0){
+VertexClusterMeshObject::VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh,int components)
+    :IDrawObject(vmesh,nmesh,components),vertex_cluster(vmesh.v().size(),0){
 }
 
 void coord_test(float height, float r) {
@@ -95,58 +95,59 @@ void PluginBackend::draw_for(QString value) {
 
 bool PluginBackend::importMesh(std::string url,std::string name){
     YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
-    auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
+    YbMesh::slice::sortByVector(triMesh, pca[2]);
+    std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
+
+    std::vector<float> z_dots(triMesh.v().size());
+    for(int i = 0; i < triMesh.v().size(); i++)
+        z_dots[i] = glm::dot(triMesh.v()[i], pca[2]);
+
+    double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0,
+                    [=](double acc,glm::vec3& e){
+                        return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);
+                                             })/triMesh.v().size());
+
+    std::vector<std::array<float,2>> intervals = {
+        {glm::mix(Z[0],Z[1],0.00),glm::mix(Z[0],Z[1],0.42)}, // 腿
+        {glm::mix(Z[0],Z[1],0.42),glm::mix(Z[0],Z[1],0.54)},
+        {glm::mix(Z[0],Z[1],0.54),glm::mix(Z[0],Z[1],0.74)}, // 躯干
+        {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)}, // 肩膀
+        {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头
+    };
+    auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()),8);
     object->centerlized();
     object->calculateNorm();
-    if(true)/*分段*/{
-        glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
-        YbMesh::slice::sortByVector(triMesh, pca[2]);
-        std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
 
-        std::vector<float> z_dots(triMesh.v().size());
-        for(int i = 0; i < triMesh.v().size(); i++)
-            z_dots[i] = glm::dot(triMesh.v()[i], pca[2]);
-
-        double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0,
-                        [=](double acc,glm::vec3& e){
-                            return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);
-                                                 })/triMesh.v().size());
-
-        std::vector<std::array<float,2>> intervals = {
-            {glm::mix(Z[0],Z[1],0.00),glm::mix(Z[0],Z[1],0.42)}, // 腿
-            {glm::mix(Z[0],Z[1],0.42),glm::mix(Z[0],Z[1],0.74)}, // 躯干
-            {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)}, // 肩膀
-            {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头
-        };
-        for(int i = 0; i < triMesh.v().size(); i++) {
-            if(z_dots[i] >= (*intervals.begin())[0] && z_dots[i] <= (*intervals.begin())[1]) {
-                object->vertex_cluster[i] = glm::dot(triMesh.v()[i], pca[1]) > 0? 2:1 ;
-            }else {
-                if( glm::length(triMesh.v()[i]-pca[2]*z_dots[i] ) > mean_dis )
-                    object->vertex_cluster[i] = 3;
-                else for(auto it = intervals.begin() + 1; it != intervals.end(); it++) {
-                    if(z_dots[i] >= (*it)[0] && z_dots[i] <= (*it)[1]) {
-                        object->vertex_cluster[i] = 4 + it - intervals.begin() ;
-                    }
+    for(int i = 0; i < triMesh.v().size(); i++) {
+        if(z_dots[i] >= (*intervals.begin())[0] && z_dots[i] <= (*intervals.begin())[1]) {
+            object->vertex_cluster[i] = glm::dot(triMesh.v()[i], pca[1]) > 0? 2:1 ;
+        }else {
+            if( glm::length(triMesh.v()[i]-pca[2]*z_dots[i] ) > mean_dis ){
+                object->vertex_cluster[i] = glm::dot(triMesh.v()[i], pca[1]) >0 ?4:3;
+            }
+            else for(auto it = intervals.begin() + 1; it != intervals.end(); it++) {
+                if(z_dots[i] >= (*it)[0] && z_dots[i] <= (*it)[1]) {
+                    object->vertex_cluster[i] = 4 + it - intervals.begin() ;
                 }
             }
         }
-//        double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0,
-//                        [=](double acc,glm::vec3& e){
-//                            return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);
-//                                                 })/triMesh.v().size());
-//        for(int i = 0; i < triMesh.v().size(); i++) {
-//            if(object->vertex_cluster[i] == 2) {
-//                if( glm::length(triMesh.v()[i]-pca[2]*z_dots[i] ) > scale )
-//                    object->vertex_cluster[i] += 3;
-//            }
-//        }
-
-
-
-        glm::mat4 coord = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca));
-        object->model = coord * object->model;
     }
+    std::sort(triMesh.f().begin(), triMesh.f().end(), [object,z_dots](const glm::vec3& e1, const glm::vec3& e2){
+        return object->vertex_cluster[e1.r] == object->vertex_cluster[e2.r] ?
+               z_dots[e1.r] < z_dots[e2.r]:object->vertex_cluster[e1.r] < object->vertex_cluster[e2.r];
+    });
+    for(int i = 0, offset = 0; i < 8; i++) {
+        object->components.intervals[i][0] = offset;
+        object->components.intervals[i][1] = std::lower_bound(triMesh.f().begin(), triMesh.f().end(), i+2 ,[object](const glm::vec3& e1, const int v){
+            return object->vertex_cluster[e1.r] < v;
+        }) - triMesh.f().begin();
+        offset = object->components.intervals[i][1];
+    }
+    object->components.update();
+
+    object->model = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca)) * object->model;
+
     RenderScript([=](QTime&) {
         object->createBufferScript();
         object->syncVertexBuffersDataScript();
@@ -154,6 +155,16 @@ bool PluginBackend::importMesh(std::string url,std::string name){
     });
     con<InteractiveCtrl>().addInteractiveObject(name, object);
     return true;
+}
+
+void PluginBackend::checkComponents(int id, bool status) {
+    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+        auto mesh = dynamic_cast<VertexClusterMeshObject*>(objectKV.second);
+        if(mesh == nullptr || mesh->visible == false) continue;
+        mesh->components.intervals[id][1] = (status?1:-1)*abs(mesh->components.intervals[id][1]);
+        mesh->components.update();
+    }
+    con<RenderCtrl>().update();
 }
 
 template <>

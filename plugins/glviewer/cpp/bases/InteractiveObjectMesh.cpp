@@ -57,6 +57,20 @@ void IDrawObject::drawElementScript(uint start, uint size) {
     drawElementBufferScript(ibo,start,size);
 }
 
+void IDrawObject::_::update() {
+    for(int i = 0; i < intervals.size(); i++) {
+        counts[i] = (intervals[i][1] > 0?(intervals[i][1] - intervals[i][0]):0)*3;
+        offset[i] = (const void*)(intervals[i][0]*sizeof(glm::vec3));
+    }
+}
+
+void IDrawObject::multiDrawElementScript() {
+    gl.glBindVertexArray(vao);
+    gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    gl.glMultiDrawElements(GL_TRIANGLES, components.counts.data(), GL_UNSIGNED_INT, components.offset.data(), components.counts.size());
+    gl.glBindVertexArray(0);
+}
+
 void IDrawObject::drawElementBufferScript(uint buffer_id, uint start, uint size) {
     gl.glBindVertexArray(vao);
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id);
@@ -72,7 +86,7 @@ void IDrawObject::centerlized() {
     model = YbMesh::visualization::centerlized(m_v);
 }
 
-InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh):IDrawObject(vmesh,nmesh),QObject(nullptr){
+InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh,int components):IDrawObject(vmesh,nmesh,components),QObject(nullptr){
 
 }
 

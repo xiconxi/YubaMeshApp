@@ -22,13 +22,15 @@ public:
 class IDrawObject: public IModelTransform{
 public:
     typedef YbMesh::indicesTriMesh<glm::vec3> TriMesh;
-    IDrawObject(TriMesh vmesh,TriMesh nmesh):m_v(vmesh),m_n(nmesh){}
+    IDrawObject(TriMesh vmesh,TriMesh nmesh, int components = 1):m_v(vmesh),m_n(nmesh),
+                components(components,components == 1? m_v.f().size():0){}
     // GL functions
     virtual void createBufferScript();
     virtual void syncVertexBuffersDataScript();
     void syncFacesBuffersDataScript();
     void drawElementScript(uint start=0, uint size=0);
     void drawElementBufferScript(uint buffer_id, uint start=0, uint size=0);
+    void multiDrawElementScript();
     ~IDrawObject(){}
 
     void calculateNorm();
@@ -39,6 +41,16 @@ public:
     YbMesh::indicesTriMesh<glm::vec3> m_v;
     YbMesh::indicesTriMesh<glm::vec3> m_n;
 
+    struct _{
+        _(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0){}
+        std::vector<glm::ivec2> intervals;
+        void update();
+    private:
+        friend class IDrawObject;
+        std::vector<int> counts;
+        std::vector<const void*> offset;
+    }components;
+
 protected:
     uint vao, ibo, v_buffer;
 };
@@ -46,7 +58,7 @@ class SelectTool;
 class InteractiveObject: public QObject,public IDrawObject{
     Q_OBJECT
 public:
-    InteractiveObject(TriMesh vmesh,TriMesh nmesh);
+    InteractiveObject(TriMesh vmesh,TriMesh nmesh, int components = 1);
     void createBufferScript() override;
     void syncSelectBufferScript();
     ~InteractiveObject();
