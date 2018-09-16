@@ -31,7 +31,14 @@ Item {
             onClicked: {
                 glMouse.clickTool(String(toolTwo))
             }
-        }  
+        }
+        CheckBox{
+            text: "坐标轴"
+            checked: true
+            onClicked: {
+                glViewer.axesVisible(checked)
+            }
+        }
 //        Button{text: "****"}
 //        Button{text: "****"}
         spacing: 10

@@ -35,48 +35,13 @@ VertexClusterMeshObject::VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh,int
     :IDrawObject(vmesh,nmesh,components),vertex_cluster(vmesh.v().size(),0){
 }
 
-void coord_test(float height, float r) {
-    auto triMesh = YbMesh::geometry::make_axes(height,r);
-
-    LOG(INFO) << triMesh.v().size() << ' ' << triMesh.f().size();
-    auto object = new IDrawObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
-    object->centerlized();
-    object->calculateNorm();
-    RenderScript([=](QTime&) {
-        object->createBufferScript();
-        object->syncVertexBuffersDataScript();
-        object->syncFacesBuffersDataScript();
-    });
-    con<InteractiveCtrl>().addInteractiveObject("coord", object);
-
-    new("z_coord") RenderScript([=](QTime&) {
-        auto shader = con<ShaderCtrl>().shader("core",true);
-        auto view = con<ViewCtrl>().view();
-        auto object = con<InteractiveCtrl>().object("coord");
-        if(object->visible == false) return;
-        int axes = object->m_v.f().size()/3;
-        shader->bind();
-        shader->setUniformValue("camera_vp", view->MatrixVP());
-        shader->setUniformValue("model", view->Model()*object->Model());
-        shader->setUniformValue("base_color", 1.0f, 0.0f, 0.0f);
-        object->drawElementScript(0,axes);
-        shader->setUniformValue("base_color", 0.0f, 1.0f, 0.0f);
-        object->drawElementScript(axes,axes);
-        shader->setUniformValue("base_color", 0.0f, 0.0f, 1.0f);
-        object->drawElementScript(2*axes,axes);
-        shader->release();
-    });
-//    auto cylinder_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/cylinder.obj";
-//    YbMesh::IO::writePartialMesh(object->m_v, *f, cylinder_file);
-}
-
 void PluginBackend::construction() {
     RenderScript([&](QTime &t) mutable {
         QString prefix = PLUGINPATH"MeshDevelop/shaders/";
         con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
-//    coord_test(10.0f, 0.1f);
+
 //    importMesh(MESHPATH"bunny.obj","bunny");
     importMesh(MESHPATH"body2.obj","body2");
     render_s = new("render") ScanRender;
@@ -95,10 +60,14 @@ void PluginBackend::draw_for(QString value) {
 
 bool PluginBackend::importMesh(std::string url,std::string name){
     YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
+    auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()),8);
+    object->centerlized();
+    object->calculateNorm();
+
     glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
     YbMesh::slice::sortByVector(triMesh, pca[2]);
-    std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
 
+    std::array<float,2> Z = {glm::dot(pca[2],triMesh.v()[(*std::prev(triMesh.f().end())).r]),glm::dot(pca[2],triMesh.v()[(*triMesh.f().begin()).r])};
     std::vector<float> z_dots(triMesh.v().size());
     for(int i = 0; i < triMesh.v().size(); i++)
         z_dots[i] = glm::dot(triMesh.v()[i], pca[2]);
@@ -115,9 +84,6 @@ bool PluginBackend::importMesh(std::string url,std::string name){
         {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)}, // 肩膀
         {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头
     };
-    auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()),8);
-    object->centerlized();
-    object->calculateNorm();
 
     for(int i = 0; i < triMesh.v().size(); i++) {
         if(z_dots[i] >= (*intervals.begin())[0] && z_dots[i] <= (*intervals.begin())[1]) {

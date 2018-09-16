@@ -8,7 +8,10 @@
 #include "utils/Pick.h"
 #include "utils/Select.h"
 #include "utils/SelectCanvas.h"
+#include "utils/auxiliary.h"
 //#include "utils/ScriptSamples.h"
+
+#include "bases/InteractiveObjectMesh.h"
 
 #include <QSGTextureProvider>
 #include <easylogging++.h>
@@ -44,6 +47,8 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
 
     con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
     con<InteractiveCtrl>().pickTool->createBufferScript();
+
+    YbCore::aux::addCoord3d(10.0f,0.1f,"axes");
 
     return ret;
 }
@@ -86,4 +91,9 @@ void FboNode::screenAreaPick(QQuickPaintedItem *item) {
     con<InteractiveCtrl>().selectTool->areasFaceSelect(item);
     con<RenderCtrl>().update();
     ((SelectCanvas*)item)->clear();
+}
+
+void FboNode::axesVisible(bool status) {
+    con<InteractiveCtrl>().object("axes")->visible = status;
+    con<RenderCtrl>().update();
 }

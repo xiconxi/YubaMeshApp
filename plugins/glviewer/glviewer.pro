@@ -26,7 +26,8 @@ SOURCES += \
     cpp/utils/ScriptSamples.cpp \
     cpp/bases/IPluginBackend.cpp \
     cpp/bases/IRenderScript.cpp \
-    cpp/bases/InteractiveObjectMesh.cpp
+    cpp/bases/InteractiveObjectMesh.cpp \
+    cpp/utils/auxiliary.cpp
 
 
 
@@ -49,7 +50,8 @@ HEADERS += \
     wrapInclude/YbCore/controller \
     wrapInclude/YbCore/coretool \
     wrapInclude/YbCore/scripts \
-    cpp/bases/InteractiveObjectMesh.h
+    cpp/bases/InteractiveObjectMesh.h \
+    cpp/utils/auxiliary.h
 
 
 

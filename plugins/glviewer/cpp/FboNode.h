@@ -28,6 +28,8 @@ public slots:
 
     void registerModule(QString module);
     void unregisterModule(QString module);
+
+    void axesVisible(bool status);
 private:
     qreal mutable m_fps = 60;
 };
