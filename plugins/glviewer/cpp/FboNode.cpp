@@ -49,6 +49,7 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
     con<InteractiveCtrl>().pickTool->createBufferScript();
 
     YbCore::aux::addCoord3d(10.0f,0.1f,"axes");
+    YbCore::aux::addBox3d(10.0f,0.1f,"box");
 
     return ret;
 }
@@ -95,5 +96,10 @@ void FboNode::screenAreaPick(QQuickPaintedItem *item) {
 
 void FboNode::axesVisible(bool status) {
     con<InteractiveCtrl>().object("axes")->visible = status;
+    con<RenderCtrl>().update();
+}
+
+void FboNode::boxVisible(bool status) {
+    con<InteractiveCtrl>().object("box")->visible = status;
     con<RenderCtrl>().update();
 }

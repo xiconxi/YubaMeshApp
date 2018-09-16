@@ -120,6 +120,7 @@ bool PluginBackend::importMesh(std::string url,std::string name){
         object->syncFacesBuffersDataScript();
     });
     con<InteractiveCtrl>().addInteractiveObject(name, object);
+
     return true;
 }
 

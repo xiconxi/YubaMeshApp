@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import MeshDevelop 1.0
+import QtQuick.Controls.Styles 1.4
+
 Item {
     Text{
         anchors.fill: parent
@@ -29,6 +31,12 @@ Item {
            id: checkBox
            text: name
            checked: check
+           style: CheckBoxStyle{
+               label: Label{
+                   text:control.text
+                   color: "white"
+               }
+           }
            Binding{
                target: checkBox
                property: "checked"

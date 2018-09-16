@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import GLViewer 1.0
+import QtQuick.Controls.Styles 1.4
 
 Item {
 //    visible: false
@@ -9,39 +10,54 @@ Item {
         anchors.fill: parent
     }
 
-//    Text{
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        anchors.bottom: parent.bottom
-//        anchors.bottomMargin: 30
-//        text: "glviewer"
-//    }
-
-    Row{
-        anchors.horizontalCenter: parent.horizontalCenter
+    Rectangle{
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 30
-        Button{
-            text: "拾取/控制"
-            onClicked: {
-                glMouse.clickTool(String(toolOne))
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width*0.6
+        height: 30
+        color: Qt.rgba(0.1,0.1,0.1,0.3)
+        Row{
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            Button{
+                text: "拾取/控制"
+                onClicked: {
+                    glMouse.clickTool(String(toolOne))
+                }
             }
-        }
-        Button{
-            text: "选区"
-            onClicked: {
-                glMouse.clickTool(String(toolTwo))
+            Button{
+                text: "选区"
+                onClicked: {
+                    glMouse.clickTool(String(toolTwo))
+                }
             }
-        }
-        CheckBox{
-            text: "坐标轴"
-            checked: true
-            onClicked: {
-                glViewer.axesVisible(checked)
+            CheckBox{
+                height: parent.height
+                text: "坐标轴"
+                checked: true
+                onClicked: glViewer.axesVisible(checked)
+                style: CheckBoxStyle{
+                    label: Label{
+                        text:control.text
+                        color: "white"
+                    }
+                }
             }
+            CheckBox{
+                height: parent.height
+                text: "包围盒"
+                checked: true
+                onClicked: glViewer.boxVisible(checked)
+                style: CheckBoxStyle{
+                    label: Label{
+                        text:control.text
+                        color: "white"
+                    }
+                }
+            }
+
+            spacing: 10
         }
-//        Button{text: "****"}
-//        Button{text: "****"}
-        spacing: 10
     }
 
     // 模型旋转、放缩、移动
