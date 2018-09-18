@@ -5,14 +5,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <easylogging++.h>
 #include <numeric>
-void YbMesh::slice::sortByVector(indicesTriMesh<glm::vec3> &mesh, glm::vec3 x) {
+void LIBSHARED_EXPORT YbMesh::slice::sortByVector(indicesTriMesh<glm::vec3> &mesh, glm::vec3 x) {
     auto& v = mesh.v();
     std::sort(mesh.f().begin(), mesh.f().end(), [=](glm::ivec3& e1, glm::ivec3& e2){
         return glm::dot(v[e1[0]] - v[e2[0]], x) > 0;
     });
 }
 
-glm::mat3 YbMesh::slice::pca_analysic(std::vector<glm::vec3>& vs,
+glm::mat3 LIBSHARED_EXPORT YbMesh::slice::pca_analysic(std::vector<glm::vec3>& vs,
                                       std::vector<glm::ivec3>::iterator begin,
                                       std::vector<glm::ivec3>::iterator end) {
     std::vector<bool> v_flag(vs.size(), false);
@@ -50,12 +50,12 @@ glm::mat3 YbMesh::slice::pca_analysic(std::vector<glm::vec3>& vs,
 //    return coord[r_id];
 }
 
-bool YbMesh::slice::isFaceInersected(indicesTriMesh<glm::vec3> &mesh,glm::ivec3 f, glm::vec3 n, float d){
+bool LIBSHARED_EXPORT YbMesh::slice::isFaceInersected(indicesTriMesh<glm::vec3> &mesh,glm::ivec3 f, glm::vec3 n, float d){
     int flags = ((glm::dot( mesh.v()[f[0]], n ) > d)+(glm::dot( mesh.v()[f[1]], n ) > d)+(glm::dot( mesh.v()[f[2]], n ) > d));
     return flags ==  1 || flags == 2;
 }
 
-std::array<glm::vec3,2> YbMesh::slice::getFaceIntersection(indicesTriMesh<glm::vec3> &mesh,glm::ivec3 f, glm::vec3 n, float d){
+std::array<glm::vec3,2> LIBSHARED_EXPORT YbMesh::slice::getFaceIntersection(indicesTriMesh<glm::vec3> &mesh,glm::ivec3 f, glm::vec3 n, float d){
     std::array<glm::vec3,2> result;
     int size = 0;
 
@@ -76,7 +76,7 @@ std::array<glm::vec3,2> YbMesh::slice::getFaceIntersection(indicesTriMesh<glm::v
     return result;
 }
 
-std::array<std::vector<glm::ivec3>::iterator,2> YbMesh::slice::getSliceInterval(indicesTriMesh<glm::vec3> &mesh,glm::vec3 n, float d, float gap) {
+std::array<std::vector<glm::ivec3>::iterator,2> LIBSHARED_EXPORT YbMesh::slice::getSliceInterval(indicesTriMesh<glm::vec3> &mesh,glm::vec3 n, float d, float gap) {
     auto& vs = mesh.v();
     std::array<std::vector<glm::ivec3>::iterator,2> result = {
         std::lower_bound(mesh.f().begin(),mesh.f().end(), d-gap,
@@ -91,7 +91,7 @@ std::array<std::vector<glm::ivec3>::iterator,2> YbMesh::slice::getSliceInterval(
     return result;
 }
 
-std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> YbMesh::slice::_RFF::sortContours(std::vector<std::array<glm::vec3,2>>&& intersections) {
+std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> LIBSHARED_EXPORT YbMesh::slice::_RFF::sortContours(std::vector<std::array<glm::vec3,2>>&& intersections) {
     std::vector<std::array< std::vector<std::array<glm::vec3,2>>::iterator,2>> intervals = {{intersections.begin(),intersections.begin()}};
     for(auto it = intersections.begin(); it != intersections.end(); it++) {
         auto find_it = std::find_if(std::next(it), intersections.end(), [=](std::array<glm::vec3,2>& e){

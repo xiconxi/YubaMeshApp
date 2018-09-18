@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-void YbMesh::visualization::calculateNorm(indicesTriMesh<glm::vec3>& vMesh, indicesTriMesh<glm::vec3>& nMesh){
+void LIBSHARED_EXPORT YbMesh::visualization::calculateNorm(indicesTriMesh<glm::vec3>& vMesh, indicesTriMesh<glm::vec3>& nMesh){
     auto& v = vMesh.v();
     auto& vn = nMesh.v();
     auto& f = vMesh.f();
@@ -24,20 +24,16 @@ void YbMesh::visualization::calculateNorm(indicesTriMesh<glm::vec3>& vMesh, indi
     }
 }
 
-glm::mat4 YbMesh::visualization::centerlized(indicesTriMesh<glm::vec3>& vMesh){
+glm::mat4 LIBSHARED_EXPORT YbMesh::visualization::normalize(indicesTriMesh<glm::vec3>& vMesh, bool centerlized){
     auto& v = vMesh.v();
     glm::vec3 center = std::accumulate(v.begin(), v.end(), glm::vec3(0),[=](glm::vec3 acc,glm::vec3& e){
         return acc+e;
     })/(float)v.size();
-//    float scale_k = std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [=](float s, glm::vec3& e){
-//        return std::max<float>(s,glm::length(e-center)* glm::length(e-center));
-//    })); // /(float)_v.size())
-
+    if(centerlized)
+        for(auto& e:v) e -= center;
 //    return  glm::scale(glm::mat4(), glm::vec3(1.4 / scale_k))*glm::translate(glm::mat4(), -center);
-    for(auto& e:v) e -= center;
-    float scale_k = std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [=](float s, glm::vec3& e){
-        return std::max<float>(s,std::powf(glm::length(e),2) );
-    }));
 
-    return  glm::scale(glm::mat4(), glm::vec3(1.4 / scale_k));
+    return  glm::scale(glm::mat4(), glm::vec3(1.4 / std::sqrt(std::accumulate(v.begin(), v.end(), 0.0,[=](float s, glm::vec3& e){
+        return std::max<float>(s,std::powf(glm::length(centerlized?e:e-center),2) );
+    }))));
 }

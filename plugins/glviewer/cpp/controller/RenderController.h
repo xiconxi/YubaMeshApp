@@ -48,7 +48,7 @@ private:
     std::list<RenderScript> anonymous_script;
     std::map<std::string,RenderScript*> named_script;
 
-    // 使用两个锁从而支持在script创建script的
+    // 使用两个锁从而支持在script创建script
     QReadWriteLock named_lock;
     QReadWriteLock anonymouse_lock;
 

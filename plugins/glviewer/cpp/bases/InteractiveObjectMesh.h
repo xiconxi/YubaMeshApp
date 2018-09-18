@@ -11,7 +11,7 @@
 #include <QObject>
 #include <YbMesh/YbMesh.hpp>
 
-class IModelTransform{
+class LIBSHARED_EXPORT IModelTransform{
 public:
     glm::mat4 model;
     QMatrix4x4 Model();
@@ -19,7 +19,7 @@ public:
     void scaleBy(float s);
 };
 
-class IDrawObject: public IModelTransform{
+class LIBSHARED_EXPORT IDrawObject: public IModelTransform{
 public:
     typedef YbMesh::indicesTriMesh<glm::vec3> TriMesh;
     IDrawObject(TriMesh vmesh,TriMesh nmesh, int components = 1):m_v(vmesh),m_n(nmesh),
@@ -34,14 +34,14 @@ public:
     ~IDrawObject(){}
 
     void calculateNorm();
-    void centerlized();
+    void normalize(bool centralized = true);
 
     bool visible = true;
 
     YbMesh::indicesTriMesh<glm::vec3> m_v;
     YbMesh::indicesTriMesh<glm::vec3> m_n;
 
-    struct _{
+    struct LIBSHARED_EXPORT _{
         _(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0){}
         std::vector<glm::ivec2> intervals;
         void update();
@@ -55,7 +55,7 @@ protected:
     uint vao, ibo, v_buffer;
 };
 class SelectTool;
-class InteractiveObject: public QObject,public IDrawObject{
+class LIBSHARED_EXPORT InteractiveObject: public QObject,public IDrawObject{
     Q_OBJECT
 public:
     InteractiveObject(TriMesh vmesh,TriMesh nmesh, int components = 1);

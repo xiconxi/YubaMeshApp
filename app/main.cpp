@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("appPath", QGuiApplication::applicationDirPath()+"/../PlugIns/");
     engine.rootContext()->setContextProperty("yubaDoc", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)+"/");
 #else
-    engine.addImportPath(app.applicationDirPath()+"/bin/");
+    engine.addImportPath(app.applicationDirPath()+"/modules/");
     engine.rootContext()->setContextProperty("appPath", QGuiApplication::applicationDirPath());
     engine.rootContext()->setContextProperty("yubaDoc", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)+"/");
 #endif

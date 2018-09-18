@@ -8,6 +8,16 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include <memory>
+#include <QtCore/QtGlobal>
+
+#ifndef LIBSHARED_EXPORT
+#if defined(YBMESH_LIBRARY)
+#  define LIBSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBSHARED_EXPORT Q_DECL_IMPORT
+#endif
+#endif
 
 namespace YbMesh {
 using std::vector;

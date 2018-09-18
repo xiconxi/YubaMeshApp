@@ -2,4 +2,6 @@
 #define CORETOOL_H
 #include "../cpp/utils/Pick.h"
 #include "../cpp/utils/Select.h"
+#define LIBSHARED_EXPORT Q_DECL_IMPORT
+
 #endif // CORETOOL_H

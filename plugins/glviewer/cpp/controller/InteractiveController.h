@@ -11,7 +11,7 @@ class SelectTool;
 class InteractiveObject;
 class IDrawObject;
 
-class InteractiveCtrl
+class LIBSHARED_EXPORT InteractiveCtrl
 {
 public:
     InteractiveCtrl();

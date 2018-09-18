@@ -72,7 +72,7 @@ bool PluginBackend::importMesh(std::string url,std::string name){
     auto& v = triMesh.v();
     auto& f = triMesh.f();
     auto object = new InteractiveObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
-    object->centerlized();
+    object->normalize();
     glm::mat3 pca   = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
     object->model = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca)) * object->model;
     norm = pca[2];

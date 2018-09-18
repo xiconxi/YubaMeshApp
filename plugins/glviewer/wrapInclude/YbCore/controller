@@ -6,6 +6,7 @@
 #include "../cpp/controller/ViewController.h"
 #include "../cpp/controller/InteractiveController.h"
 
+#  define LIBSHARED_EXPORT Q_DECL_IMPORT
 // needed by windows ?
 //extern template ShaderCtrl& con();
 //extern template RenderCtrl& con();

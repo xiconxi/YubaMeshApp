@@ -18,11 +18,7 @@ YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_spherical(int rows) {
     return YbMesh::indicesTriMesh<glm::vec3>(vs,fs);
 }
 
-YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_cylinders(float radius,int scale) {
-
-}
-
-YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_axes(float height,float r) {
+YbMesh::indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::geometry::make_axes(float height,float r) {
     auto v = std::make_shared<std::vector<glm::vec3>>();
     auto f = std::make_shared<std::vector<glm::ivec3>>();
 
@@ -74,7 +70,7 @@ YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_axes(float height,float
     return YbMesh::indicesTriMesh<glm::vec3>(v,f);
 }
 
-YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_box(float height,float r) {
+YbMesh::indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::geometry::make_box(float height,float r) {
     auto v = std::make_shared<std::vector<glm::vec3>>();
     auto f = std::make_shared<std::vector<glm::ivec3>>();
 
@@ -114,12 +110,16 @@ YbMesh::indicesTriMesh<glm::vec3> YbMesh::geometry::make_box(float height,float 
         }
     }
 
-    for(int e = 0; e< 8; e++) {
+
+    for(int e = 0,offset = 0; e< 8; e++) {
         v->emplace_back(0.5f*height*glm::vec3(e&4?-1.0f:1.0f,e&2?-1.0f:1.0f,e&1?-1.0f:1.0f));
         for(int j = 0; j < 20; j++) {
-            f->emplace_back(glm::ivec3(j+800+80*bool(e&4)+100*(e&3),(j+1)%20+800+80*bool(e&4)+100*(e&3),1200+e));
-            f->emplace_back(glm::ivec3(j+400+80*bool(e&2)+100*(((e&4)>>1)+(e&1)),(j+1)%20+400+80*bool(e&2)+100*(((e&4)>>1)+(e&1)),1200+e));
-            f->emplace_back(glm::ivec3(j+ 00+80*bool(e&1)+100*((e&6)>>1),(j+1)%20+ 00+80*bool(e&1)+100*((e&6)>>1),1200+e));
+            offset = 800+80*bool(e&4)+100*(e&3);
+            f->emplace_back(offset%100 == 80 ? glm::ivec3((j+1)%20+offset,j+offset,1200+e):glm::ivec3(j+offset,(j+1)%20+offset,1200+e));
+            offset = 400+80*bool(e&2)+100*(((e&4)>>1)+(e&1));
+            f->emplace_back(offset%100 == 80 ? glm::ivec3((j+1)%20+offset,j+offset,1200+e):glm::ivec3(j+offset,(j+1)%20+offset,1200+e));
+            offset =  00+80*bool(e&1)+100*((e&6)>>1);
+            f->emplace_back(offset%100 == 80 ? glm::ivec3((j+1)%20+offset,j+offset,1200+e):glm::ivec3(j+offset,(j+1)%20+offset,1200+e));
         }
     }
 

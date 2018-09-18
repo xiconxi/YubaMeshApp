@@ -2,6 +2,7 @@
 #include <string>
 #include "../utils/Select.h"
 #include "../bases/InteractiveObjectMesh.h"
+
 template<>
 LIBSHARED_EXPORT InteractiveCtrl& con<InteractiveCtrl>(){
     return ICtrl<InteractiveCtrl>::getInstanceRef();

@@ -2,13 +2,14 @@
 #include "format_obj.h"
 #include <fstream>
 #include <easylogging++.h>
+#include <iterator>
 
 INITIALIZE_EASYLOGGINGPP
 
 template <class T>
 using indicesTriMesh = YbMesh::indicesTriMesh<T>;
 
-indicesTriMesh<glm::vec3> YbMesh::IO::importOBJ_V0(std::string filename) {
+indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V0(std::string filename) {
     std::ifstream fileHandle(filename,std::ios_base::in);
     indicesTriMesh<glm::vec3> vmesh(std::make_shared<std::vector<glm::vec3>>(),
                                     std::make_shared<std::vector<glm::ivec3>>());
@@ -56,7 +57,7 @@ indicesTriMesh<glm::vec3> YbMesh::IO::importOBJ_V0(std::string filename) {
     return vmesh;
 }
 
-std::pair<indicesTriMesh<glm::vec2>,indicesTriMesh<glm::vec3>> YbMesh::IO::importOBJ_V1(std::string filename) {
+std::pair<indicesTriMesh<glm::vec2>,indicesTriMesh<glm::vec3>> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V1(std::string filename) {
     std::ifstream fileHandle(filename,std::ios_base::in);
     auto& xyz_faces = *(new std::vector<glm::ivec3>());
     auto& uv_faces = *(new std::vector<glm::ivec3>());
@@ -107,7 +108,7 @@ std::ostream& operator << (std::ostream &os, std::vector<T> &faces){
     return os << std::endl; // std::string(mesh_prefix.size(),'\b')+std::string(mesh_prefix.size(),' ')
 }
 
-void YbMesh::IO::exportObj(indicesTriMesh<glm::vec3>& mesh, std::string filename) {
+void LIBSHARED_EXPORT YbMesh::IO::exportObj(indicesTriMesh<glm::vec3>& mesh, std::string filename) {
 //    if(mesh.v().size() == 0 || mesh.f().size() == 0) {
 //        std::cout << "export target is empty: " << filename  << std::endl;
 //        return ;
@@ -123,7 +124,7 @@ void YbMesh::IO::exportObj(indicesTriMesh<glm::vec3>& mesh, std::string filename
     file.close();
 }
 
-void YbMesh::IO::exportObj(indicesTriMesh<glm::vec2>& mesh, std::string filename) {
+void LIBSHARED_EXPORT YbMesh::IO::exportObj(indicesTriMesh<glm::vec2>& mesh, std::string filename) {
     std::ofstream file(filename,std::ios_base::out);
     if(!file.is_open() ) {
         std::cout << "failed to export obj: " << filename << std::endl;
@@ -134,7 +135,7 @@ void YbMesh::IO::exportObj(indicesTriMesh<glm::vec2>& mesh, std::string filename
     file.close();
 }
 
-void YbMesh::IO::writePartialMesh(indicesTriMesh<glm::vec3>& mesh,const std::vector<glm::ivec3> &faces, std::string file_name) {
+void LIBSHARED_EXPORT YbMesh::IO::writePartialMesh(indicesTriMesh<glm::vec3>& mesh,const std::vector<glm::ivec3> &faces, std::string file_name) {
     std::map<int,int> v_rank;
     std::fstream fileHandle;
     fileHandle.open(file_name,std::ofstream::out);

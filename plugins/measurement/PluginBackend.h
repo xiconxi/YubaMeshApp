@@ -49,7 +49,9 @@ private:
     SliceRender* render_s;
 };
 
+/*
 #ifndef PLUGINBACKEND_CPP
 extern template QObject* Backend<PluginBackend>(QQmlEngine *pQMLEngine=nullptr,QJSEngine *pJSEngine=nullptr);
 #endif
+*/
 #endif // PLUGINBACKEND_H

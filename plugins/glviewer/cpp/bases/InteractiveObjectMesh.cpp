@@ -82,8 +82,8 @@ void IDrawObject::calculateNorm() {
     YbMesh::visualization::calculateNorm(m_v, m_n);
 }
 
-void IDrawObject::centerlized() {
-    model = YbMesh::visualization::centerlized(m_v);
+void IDrawObject::normalize(bool centralized) {
+    model = YbMesh::visualization::normalize(m_v,centralized);
 }
 
 InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh,int components):IDrawObject(vmesh,nmesh,components),QObject(nullptr){

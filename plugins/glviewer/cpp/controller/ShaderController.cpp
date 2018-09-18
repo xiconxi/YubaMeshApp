@@ -29,6 +29,9 @@ void ShaderCtrl::initialize(){
     addShaderProgram("core", shaderConfig{
                          V(prefix+"default"),F(prefix+"default")
                      });
+    addShaderProgram("axes", shaderConfig{
+                         V(prefix+"tex_axes"),F(prefix+"tex_axes")
+                     });
     addShaderProgram("selection", shaderConfig{
                          V(prefix+"default"),F(prefix+"selection")
                      });

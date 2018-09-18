@@ -16,7 +16,7 @@ DESTDIR = ../
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp
-RESOURCES += qml/qml.qrc
+
 INCLUDEPATH += ../depends
 #LIBS += -L$$OUT_PWD/../easylog/ -leasylog
 
@@ -62,4 +62,13 @@ osx {
     depends.files += $$OUT_PWD/../depends/FrameWorks
     depends.path = Contents
     QMAKE_BUNDLE_DATA += depends
+}else{
+    cpdll.files += $$OUT_PWD/../depends/FrameWorks/*
+    cpdll.files += ../plugins/pluginsConfig.xml
+    cpdll.path = $$DESTDIR/
+
+    COPIES += cpdll
 }
+
+RESOURCES += \
+    qml/qml.qrc

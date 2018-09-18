@@ -1,4 +1,7 @@
 TEMPLATE = lib
+TARGET = YbMesh
+
+DEFINES += YBMESH_LIBRARY
 
 INCLUDEPATH += \
     ../../depends/easyloggingpp/src \
@@ -13,7 +16,8 @@ HEADERS += \
     src/types/type_mesh.h \
     src/subdivision/sqrt3.h \
     src/visualization.h \
-    src/slice.h
+    src/slice.h \
+    ybmesh_global.h
 
 SOURCES += \
     ../easyloggingpp/src/easylogging++.cc \
@@ -24,7 +28,7 @@ SOURCES += \
     src/visualization.cpp \
     src/slice.cpp
 
-TARGET = YbMesh
+
 DESTDIR = ../FrameWorks/
 
 QMAKE_LFLAGS_SONAME = '-Wl,-install_name,@rpath/'

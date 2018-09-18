@@ -38,7 +38,7 @@ VertexClusterMeshObject::VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh,int
 void PluginBackend::construction() {
     RenderScript([&](QTime &t) mutable {
         QString prefix = PLUGINPATH"MeshDevelop/shaders/";
-        con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
+       // con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(prefix+"indices"),F(prefix+"indices") });
     });
 
@@ -61,7 +61,7 @@ void PluginBackend::draw_for(QString value) {
 bool PluginBackend::importMesh(std::string url,std::string name){
     YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
     auto object = new VertexClusterMeshObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()),8);
-    object->centerlized();
+    object->normalize();
     object->calculateNorm();
 
     glm::mat3 pca = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
@@ -82,7 +82,7 @@ bool PluginBackend::importMesh(std::string url,std::string name){
         {glm::mix(Z[0],Z[1],0.42),glm::mix(Z[0],Z[1],0.54)},
         {glm::mix(Z[0],Z[1],0.54),glm::mix(Z[0],Z[1],0.74)}, // 躯干
         {glm::mix(Z[0],Z[1],0.74),glm::mix(Z[0],Z[1],0.84)}, // 肩膀
-        {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头
+        {glm::mix(Z[0],Z[1],0.84),glm::mix(Z[0],Z[1],1.00)}, // 头部
     };
 
     for(int i = 0; i < triMesh.v().size(); i++) {

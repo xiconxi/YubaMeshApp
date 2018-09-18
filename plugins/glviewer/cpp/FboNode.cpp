@@ -48,7 +48,7 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
     con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
     con<InteractiveCtrl>().pickTool->createBufferScript();
 
-    YbCore::aux::addCoord3d(10.0f,0.1f,"axes");
+    YbCore::aux::addCoord3d(1.0f,0.01f,"axes");
     YbCore::aux::addBox3d(10.0f,0.1f,"box");
 
     return ret;

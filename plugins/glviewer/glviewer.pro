@@ -12,6 +12,7 @@ INCLUDEPATH += \
 
 # Input
 SOURCES += \
+    ../../depends/easyloggingpp/src/easylogging++.cc \
     cpp/FboNode.cpp \
     cpp/glviewer_plugin.cpp \
     cpp/controller/CentralController.cpp \
@@ -27,7 +28,8 @@ SOURCES += \
     cpp/bases/IPluginBackend.cpp \
     cpp/bases/IRenderScript.cpp \
     cpp/bases/InteractiveObjectMesh.cpp \
-    cpp/utils/auxiliary.cpp
+    cpp/utils/auxiliary.cpp \
+
 
 
 
@@ -69,8 +71,10 @@ cpshaders.path = $$DESTDIR/glsl
 
 COPIES += cpqmldir \
     cpshaders
+
+INCLUDEPATH += ../../depends/YbMesh/inc
+LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
+
 osx{
-    INCLUDEPATH += ../../depends/YbMesh/inc
-    LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
     QMAKE_POST_LINK += install_name_tool -id @rpath/libGLViewer.dylib ../../modules/$$TARGET/libGLViewer.dylib
 }

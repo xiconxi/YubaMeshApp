@@ -12,7 +12,7 @@ bool IPluginBackend::importMesh(QString url){
 bool IPluginBackend::importMesh(std::string url, std::string name) {
     YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
     auto object = new InteractiveObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
-    object->centerlized();
+    object->normalize();
     object->calculateNorm();
     RenderScript([=](QTime&) {
         object->createBufferScript();
