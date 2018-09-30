@@ -14,18 +14,6 @@ LIBSHARED_EXPORT extern  ActiveGL gl;
 class LIBSHARED_EXPORT CentralCtrl
 {
 public:
-    enum RSTYPE{
-        RENDER, SHADER, VIEW
-    };
-
-    void setModuleName(std::string name);
-
-    void releaseModuleResource(std::string name);
-
-    void resourceHook(RSTYPE type, std::string name);
-
-    std::string module() const{return current_module_name;}
-
     void setFboNode(const QQuickFramebufferObject* ref){fboNode=ref;}
 
     const QQuickFramebufferObject* GLNode(){return fboNode;}
@@ -36,8 +24,6 @@ private:
     CentralCtrl(){}
     friend class ICtrl<CentralCtrl>;
     ~CentralCtrl() = delete;
-    std::string current_module_name = "~";
-    std::map<std::string, std::list<std::pair<RSTYPE,std::string>> > resource;
 
     const QQuickFramebufferObject* fboNode = nullptr;
 };

@@ -28,8 +28,8 @@ void ViewerMatrix::scaleBy(float s) {
 }
 
 template<>
-LIBSHARED_EXPORT ViewCtrl& con<ViewCtrl>(){
-    return ICtrl<ViewCtrl>::getInstanceRef();
+LIBSHARED_EXPORT ViewCtrl& global::con<ViewCtrl>(){
+    return ICtrl<ViewCtrl>::getGrobalInstanceRef();
 }
 
 void ViewCtrl::updateSize(int _width, int _height){
@@ -41,11 +41,10 @@ void ViewCtrl::updateSize(int _width, int _height){
 
 
 void ViewCtrl::addView(std::string name, ViewerMatrix *matrix) {
-    if(viewMap.find(con<CentralCtrl>().module()+name) != viewMap.end())
-        delete viewMap[con<CentralCtrl>().module()+name];
-    viewMap[con<CentralCtrl>().module()+name] = matrix;
+    if(viewMap.find(name) != viewMap.end())
+        delete viewMap[name];
+    viewMap[name] = matrix;
     if(activeView == nullptr) activeView = matrix;
-    con<CentralCtrl>().resourceHook(CentralCtrl::VIEW,name);
 }
 
 void ViewCtrl::releaseView(std::string name) {
@@ -54,7 +53,7 @@ void ViewCtrl::releaseView(std::string name) {
 }
 
 void ViewCtrl::ActiveView(std::string name,bool use_core) {
-    activeView =viewMap[(use_core?"_":con<CentralCtrl>().module())+name];
+    activeView =viewMap[name];
 }
 
 ViewerMatrix* ViewCtrl::view(){

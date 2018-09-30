@@ -3,25 +3,32 @@
 
 #include "../bases/ISingleton.inc"
 #include <QOpenGLShader>
+#include <array>
 #include <QOpenGLShaderProgram>
 #include "CentralController.h"
+
+typedef std::map<QOpenGLShader::ShaderType,QString> GLSLFileConfig;
+struct ShaderProgramConfig
+{
+    std::string name;
+    GLSLFileConfig config;
+    std::function<void(GLuint)> initial_f;
+};
 
 class LIBSHARED_EXPORT ShaderCtrl
 {
 public:
-    void initialize();
-    QOpenGLShaderProgram* shader(std::string name,bool use_core=false);
-    bool addShaderProgram(std::string name,std::map<QOpenGLShader::ShaderType,QString> shader_map,
-                          std::function<void(GLuint)> f=nullptr);
+    ~ShaderCtrl();
+    QOpenGLShaderProgram* shader(std::string name);
+    bool addShaderProgram(std::initializer_list<ShaderProgramConfig> list);
 
     void releaseShader(std::string name);
 
 private:
-    std::map<std::string,QOpenGLShaderProgram*> program;
+    std::map<std::string, QOpenGLShaderProgram* > program;
     friend class ICtrl<ShaderCtrl>;
     ShaderCtrl();
 };
-typedef std::map<QOpenGLShader::ShaderType,QString> shaderConfig;
 
 #define V(x) {QOpenGLShader::Vertex,   x+".v.glsl"}
 #define G(x) {QOpenGLShader::Geometry,   x+".g.glsl"}

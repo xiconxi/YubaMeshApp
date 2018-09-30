@@ -35,18 +35,29 @@ void FboNode::set_fps(qreal time) const{
 }
 
 QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
-    con<CentralCtrl>().setFboNode(this);
-    auto ret =  &con<RenderCtrl>();
+    global::con<CentralCtrl>().setFboNode(this);
+    auto ret =  &global::con<RenderCtrl>();
 
-    con<ShaderCtrl>().initialize();
-    con<ViewCtrl>().addView("cam",new ViewerMatrix());
+    QString prefix = PLUGINPATH+QString("GLViewer/glsl/");
+    global::con<ShaderCtrl>().addShaderProgram({
+       {"picker",GLSLFileConfig{V(prefix+"picker"),F(prefix+"picker")},nullptr},
+       {"core"  ,GLSLFileConfig{V(prefix+"default"),F(prefix+"default")},nullptr},
+       {"axes",GLSLFileConfig{V(prefix+"tex_axes"),F(prefix+"tex_axes")},nullptr},
+       {"selection",GLSLFileConfig{V(prefix+"default"),F(prefix+"selection")},nullptr},
+       {"selection",GLSLFileConfig{V(prefix+"select_mask"),G(prefix+"select_mask")},[](GLuint id){
+            const char* select_varing[] = {"face"};
+            gl.glTransformFeedbackVaryings(id, 1, select_varing ,GL_INTERLEAVED_ATTRIBS);
+        }}
+    });
+
+    global::con<ViewCtrl>().addView("cam",new ViewerMatrix());
 
     // meshCtrl Callback! must initialize
-    con<InteractiveCtrl>().selectTool = new("selectTool") SelectTool();
-    con<InteractiveCtrl>().selectTool->createBufferScript();
+    global::con<InteractiveCtrl>().selectTool = new("selectTool") SelectTool();
+    global::con<InteractiveCtrl>().selectTool->createBufferScript();
 
-    con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
-    con<InteractiveCtrl>().pickTool->createBufferScript();
+    global::con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
+    global::con<InteractiveCtrl>().pickTool->createBufferScript();
 
     YbCore::aux::addCoord3d(1.0f,0.01f,"axes");
     YbCore::aux::addBox3d(10.0f,0.1f,"box");
@@ -55,51 +66,43 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
 }
 
 void FboNode::move(int x, int y) {
-    con<RenderCtrl>().render_lock.lockForRead();
-    con<ViewCtrl>().view()->move(x, y);
-    con<RenderCtrl>().update();
-    con<RenderCtrl>().render_lock.unlock();
+    global::con<RenderCtrl>().render_lock.lockForRead();
+    global::con<ViewCtrl>().view()->move(x, y);
+    global::con<RenderCtrl>().update();
+    global::con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::rotate(int x, int y) {
-    con<RenderCtrl>().render_lock.lockForRead();
-    con<ViewCtrl>().view()->rotate(x, y);
-    con<RenderCtrl>().update();
-    con<RenderCtrl>().render_lock.unlock();
+    global::con<RenderCtrl>().render_lock.lockForRead();
+    global::con<ViewCtrl>().view()->rotate(x, y);
+    global::con<RenderCtrl>().update();
+    global::con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::scaleBy(float s) {
-    con<RenderCtrl>().render_lock.lockForRead();
-    con<ViewCtrl>().view()->scaleBy(s);
-    con<RenderCtrl>().update();
-    con<RenderCtrl>().render_lock.unlock();
-}
-
-void FboNode::registerModule(QString module) {
-    con<CentralCtrl>().setModuleName(module.toStdString());
-}
-
-void FboNode::unregisterModule(QString module) {
-    con<CentralCtrl>().releaseModuleResource(module.toStdString());
+    global::con<RenderCtrl>().render_lock.lockForRead();
+    global::con<ViewCtrl>().view()->scaleBy(s);
+    global::con<RenderCtrl>().update();
+    global::con<RenderCtrl>().render_lock.unlock();
 }
 
 void FboNode::singleFacePick(int x, int y) {
-    con<InteractiveCtrl>().pickTool->meshPick(x,y);
-    con<RenderCtrl>().update();
+    global::con<InteractiveCtrl>().pickTool->meshPick(x,y);
+    global::con<RenderCtrl>().update();
 }
 
 void FboNode::screenAreaPick(QQuickPaintedItem *item) {
-    con<InteractiveCtrl>().selectTool->areasFaceSelect(item);
-    con<RenderCtrl>().update();
+    global::con<InteractiveCtrl>().selectTool->areasFaceSelect(item);
+    global::con<RenderCtrl>().update();
     ((SelectCanvas*)item)->clear();
 }
 
 void FboNode::axesVisible(bool status) {
-    con<InteractiveCtrl>().object("axes")->visible = status;
-    con<RenderCtrl>().update();
+    global::con<InteractiveCtrl>().object("axes")->visible = status;
+    global::con<RenderCtrl>().update();
 }
 
 void FboNode::boxVisible(bool status) {
-    con<InteractiveCtrl>().object("box")->visible = status;
-    con<RenderCtrl>().update();
+    global::con<InteractiveCtrl>().object("box")->visible = status;
+    global::con<RenderCtrl>().update();
 }

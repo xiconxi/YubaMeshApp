@@ -62,9 +62,9 @@ template <typename T>
 class  CriticalProperty{
 public:
     void set(T&& value){
-        con<RenderCtrl>().render_lock.lockForRead();
+        global::con<RenderCtrl>().render_lock.lockForRead();
         property = value;
-        con<RenderCtrl>().render_lock.unlock();
+        global::con<RenderCtrl>().render_lock.unlock();
     }
     void set(T& value){
         set(std::move(value));

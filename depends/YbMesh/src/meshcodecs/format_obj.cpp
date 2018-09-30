@@ -59,10 +59,10 @@ indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V0(std::string 
 
 std::pair<indicesTriMesh<glm::vec2>,indicesTriMesh<glm::vec3>> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V1(std::string filename) {
     std::ifstream fileHandle(filename,std::ios_base::in);
-    auto& xyz_faces = *(new std::vector<glm::ivec3>());
-    auto& uv_faces = *(new std::vector<glm::ivec3>());
-    auto& xyzs = *(new std::vector<glm::vec3>());
-    auto& uvs = *(new std::vector<glm::vec2>());
+    auto xyz_faces = std::make_shared<std::vector<glm::ivec3>>();
+    auto uv_faces = std::make_shared<std::vector<glm::ivec3>>();
+    auto xyzs = std::make_shared<std::vector<glm::vec3>>();
+    auto uvs = std::make_shared<std::vector<glm::vec2>>();
 
     if(!fileHandle.is_open() ) {
         LOG(INFO) << "failed to load obj: " << filename ;
@@ -73,18 +73,18 @@ std::pair<indicesTriMesh<glm::vec2>,indicesTriMesh<glm::vec3>> LIBSHARED_EXPORT 
         if ( tmpLine[0] == '#' ) continue;
         char *start;
         if((start=strstr(tmpLine,"v "))){
-            xyzs.resize(xyzs.size()+1);
-            auto& xyz = *(std::prev(xyzs.end()));
+            xyzs->resize(xyzs->size()+1);
+            auto& xyz = *(std::prev(xyzs->end()));
             sscanf(start,"v %f%f%f",&xyz[0],&xyz[1],&xyz[2]);
         }else if((start=strstr(tmpLine,"vt "))){
-            uvs.resize(uvs.size()+1);
-            auto& uv = *(std::prev(uvs.end()));
+            uvs->resize(uvs->size()+1);
+            auto& uv = *(std::prev(uvs->end()));
             sscanf(start,"vt %f%f",&uv[0],&uv[1]);
         }else if((start=strstr(tmpLine,"f "))){
-            uv_faces.resize(uv_faces.size()+1);
-            auto& tf = *(std::prev(uv_faces.end()));
-            xyz_faces.resize(xyz_faces.size()+1);
-            auto& vf = *(std::prev(xyz_faces.end()));
+            uv_faces->resize(uv_faces->size()+1);
+            auto& tf = *(std::prev(uv_faces->end()));
+            xyz_faces->resize(xyz_faces->size()+1);
+            auto& vf = *(std::prev(xyz_faces->end()));
             sscanf(start,"f %d/%d %d/%d %d/%d",&vf[0],&tf[0],&vf[1],&tf[1],&vf[2],&tf[2]);
             vf -= 1; tf -= 1;
         }

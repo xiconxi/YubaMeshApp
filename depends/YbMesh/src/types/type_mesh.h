@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 #include <memory>
+#include <iostream>
 #include <QtCore/QtGlobal>
 
 #ifndef LIBSHARED_EXPORT
@@ -27,17 +28,21 @@ using std::vector;
         indicesTriMesh(std::shared_ptr<vector<T>> _vp, std::shared_ptr<vector<glm::ivec3>> _fp)
             :vp(_vp),fp(_fp){}
 
-        indicesTriMesh(std::shared_ptr<vector<T>> _vp, vector<glm::ivec3>& _f)
-            :vp(_vp),fp(std::shared_ptr<vector<glm::ivec3> >(&_f)){}
-
-        indicesTriMesh(vector<T>& _v, vector<glm::ivec3>& _f)
-            :vp(std::shared_ptr<vector<T> >(&_v)),fp(std::shared_ptr<vector<glm::ivec3> >(&_f)){}
+        ~indicesTriMesh() {
+            std::cout << "~indicesTriMesh" << std::endl;
+        }
 
         vector<T>& v(){
             return *vp;
         }
         vector<glm::ivec3>& f(){
             return *fp;
+        }
+        std::shared_ptr<vector<T>> shared_v() const{
+            return vp;
+        }
+        std::shared_ptr<vector<glm::ivec3>> shared_f() const {
+            return fp;
         }
     private:
         std::shared_ptr<vector<T>> vp;

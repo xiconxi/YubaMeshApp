@@ -19,15 +19,18 @@ void PluginBackend::workMode(QString mode) {
         render_s->changeRender(std::bind(&SliceRender::scanLineAnimation, render_s, std::placeholders::_1));
     else if(mode == "pick")
         render_s->changeRender(std::bind(&SliceRender::drawModelWithSlice, render_s, std::placeholders::_1));
-    con<RenderCtrl>().update();
+    global::con<RenderCtrl>().update();
 }
 
 void PluginBackend::construction() {
+    IPluginBackend::construction();
     QString shader_prefix = PLUGINPATH"Measurement/shaders/";
     RenderScript([=](QTime& t) {
-        con<ShaderCtrl>().addShaderProgram("base", shaderConfig{ V(shader_prefix+"indices"),F(shader_prefix+"indices") });
+        plugin::con<ShaderCtrl>().addShaderProgram({{"base", GLSLFileConfig{ V(shader_prefix+"indices"),F(shader_prefix+"indices") },nullptr}});
     });
-    render_s = new("base") SliceRender();
+
+    if(render_s == nullptr)
+        render_s = new("base") SliceRender();
     this->importMesh(MESHPATH"body2.obj","scanbody");
 
     emit measureValueUpdate(1,QString::number(sliceInRatio(0.72f),'f',2));
@@ -38,7 +41,7 @@ void PluginBackend::construction() {
 
 float PluginBackend::sliceInRatio(float ratio) {
     float dis = glm::mix(render_s->bounding_z[0],render_s->bounding_z[1],ratio);
-    auto mesh = con<InteractiveCtrl>().object("scanbody")->m_v;
+    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody")->m_v;
     auto interval = YbMesh::slice::getSliceInterval(mesh, norm, dis, gap);
     std::vector<std::array<glm::vec3,2>> slice_res;
     for(auto it = interval[0]; it != interval[1]; it++) {
@@ -46,8 +49,8 @@ float PluginBackend::sliceInRatio(float ratio) {
             slice_res.emplace_back(YbMesh::slice::getFaceIntersection(mesh, *it, norm, dis));
         }
     }
-    auto view = con<ViewCtrl>().view();
-    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*con<InteractiveCtrl>().object("scanbody")->model;
+    auto view = global::con<ViewCtrl>().view();
+    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<InteractiveCtrl>().object("scanbody")->model;
     std::vector<float> girths;
 
     auto& v = mesh.v();
@@ -63,21 +66,16 @@ float PluginBackend::sliceInRatio(float ratio) {
     return *std::max_element(girths.begin(),girths.end());
 }
 
-void PluginBackend::destruction() {
-
-}
-
 bool PluginBackend::importMesh(std::string url,std::string name){
-    YbMesh::indicesTriMesh<glm::vec3> triMesh = YbMesh::IO::importOBJ_V0(url);
-    auto& v = triMesh.v();
-    auto& f = triMesh.f();
-    auto object = new InteractiveObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    auto object = new InteractiveObject(YbMesh::IO::importOBJ_V0(url));
+    auto& triMesh = object->m_v;
+    auto& v = object->m_v.v();
+    auto& f = object->m_v.f();
     object->normalize();
     glm::mat3 pca   = YbMesh::slice::pca_analysic(triMesh.v(), triMesh.f().begin(), triMesh.f().end());
-    object->model = glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca)) * object->model;
+    object->model = glm::rotate(glm::mat4(),3.1415926f,glm::vec3(0,0,1))* glm::mat4(glm::transpose(pca)) * object->model;
     norm = pca[2];
     YbMesh::slice::sortByVector(triMesh,norm);
-
 
     render_s->bounding_z[1] = glm::dot(norm,v[(*f.begin())[0]]);
     render_s->bounding_z[0] = glm::dot(norm,v[(*std::prev(f.end()))[0]]);
@@ -93,21 +91,20 @@ bool PluginBackend::importMesh(std::string url,std::string name){
     float model_height = glm::dot(norm,(v[(*f.begin())[0]]-v[(*std::prev(f.end()))[0]]));
     emit measureValueUpdate(0,QString::number(model_height,'f',2));
 
-
     object->calculateNorm();
     RenderScript([=](QTime&) {
         object->createBufferScript();
         object->syncVertexBuffersDataScript();
         object->syncFacesBuffersDataScript();
-        object->syncSelectBufferScript();
+//        object->syncSelectBufferScript();
     });
-    con<InteractiveCtrl>().addInteractiveObject(name, object);
+    plugin::con<InteractiveCtrl>().addInteractiveObject(name, object);
 
     return true;
 }
 
 float PluginBackend::slice(float dis) {
-    auto mesh = con<InteractiveCtrl>().object("scanbody")->m_v;
+    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody")->m_v;
     auto interval = YbMesh::slice::getSliceInterval(mesh, norm, dis, gap);
     std::vector<std::array<glm::vec3,2>> slice_res;
     for(auto it = interval[0]; it != interval[1]; it++) {
@@ -115,8 +112,8 @@ float PluginBackend::slice(float dis) {
             slice_res.emplace_back(YbMesh::slice::getFaceIntersection(mesh, *it, norm, dis));
         }
     }
-    auto view = con<ViewCtrl>().view();
-    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*con<InteractiveCtrl>().object("scanbody")->model;
+    auto view = global::con<ViewCtrl>().view();
+    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<InteractiveCtrl>().object("scanbody")->model;
     float w = canvas->width();
     float h = canvas->height();
     std::vector<float> girths;
@@ -141,17 +138,17 @@ float PluginBackend::slice(float dis) {
 }
 
 void PluginBackend::slice(int x, int y) {
-    int f_id = con<InteractiveCtrl>().pickTool->getSingleFacePick(x,y);
+    int f_id = global::con<InteractiveCtrl>().pickTool->getSingleFacePick(x,y);
     if(f_id == -1) {
          canvas->update();
          return ;
     }
-    auto mesh = con<InteractiveCtrl>().object("scanbody");
+    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody");
     auto& v = mesh->m_v.v();
     auto& f = mesh->m_v.f();
     render_s->dis = glm::dot(norm, (v[f[f_id][0]]+v[f[f_id][1]]+v[f[f_id][2]])/3.0f);
     slice(render_s->dis);
-    con<RenderCtrl>().update();
+    global::con<RenderCtrl>().update();
 }
 
 void PluginBackend::setSliceCanvas(QQuickPaintedItem* item) {

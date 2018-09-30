@@ -22,8 +22,7 @@ public:
 class LIBSHARED_EXPORT IDrawObject: public IModelTransform{
 public:
     typedef YbMesh::indicesTriMesh<glm::vec3> TriMesh;
-    IDrawObject(TriMesh vmesh,TriMesh nmesh, int components = 1):m_v(vmesh),m_n(nmesh),
-                components(components,components == 1? m_v.f().size():0){}
+    IDrawObject(TriMesh&& vmesh, int components = 1);
     // GL functions
     virtual void createBufferScript();
     virtual void syncVertexBuffersDataScript();
@@ -31,7 +30,7 @@ public:
     void drawElementScript(uint start=0, uint size=0);
     void drawElementBufferScript(uint buffer_id, uint start=0, uint size=0);
     void multiDrawElementScript();
-    ~IDrawObject(){}
+    virtual ~IDrawObject();
 
     void calculateNorm();
     void normalize(bool centralized = true);
@@ -58,10 +57,11 @@ class SelectTool;
 class LIBSHARED_EXPORT InteractiveObject: public QObject,public IDrawObject{
     Q_OBJECT
 public:
-    InteractiveObject(TriMesh vmesh,TriMesh nmesh, int components = 1);
+    InteractiveObject(TriMesh&& vmesh, int components = 1);
     void createBufferScript() override;
     void syncSelectBufferScript();
     ~InteractiveObject();
+
     const std::vector<glm::ivec3>& selectedFaces();
 signals:
     void FaceSelected(InteractiveObject* object);

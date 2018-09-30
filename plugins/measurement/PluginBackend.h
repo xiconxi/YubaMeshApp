@@ -27,8 +27,6 @@ public:
 
     Q_INVOKABLE void construction() override;
 
-    Q_INVOKABLE void destruction() override;
-
     Q_INVOKABLE void setSliceCanvas(QQuickPaintedItem* item);
 
     Q_INVOKABLE float sliceInRatio(float ratio);
@@ -46,7 +44,7 @@ signals:
     void measureValueUpdate(int valueId, QString ms_value);
 private:
     void test(std::vector<std::complex<float> >&  timevec);
-    SliceRender* render_s;
+    SliceRender* render_s = nullptr;
 };
 
 /*

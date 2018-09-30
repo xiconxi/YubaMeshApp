@@ -15,11 +15,11 @@ void SelectTool::clearSelect() {
 }
 
 void SelectTool::SelectScript(QTime& t) {
-    auto shader = con<ShaderCtrl>().shader("select",true);
-    auto view = con<ViewCtrl>().view();
+    auto shader = global::con<ShaderCtrl>().shader("select");
+    auto view = global::con<ViewCtrl>().view();
     shader->bind();
     shader->setUniformValue("camera_vp", view->MatrixVP());
-    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+    for(auto objectKV:global::con<InteractiveCtrl>().allObjects()){
         auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
         if(mesh == nullptr || mesh->visible == false) continue;
         this->beginStreamQueryScript();
@@ -47,16 +47,16 @@ void SelectTool::SelectScript(QTime& t) {
 }
 
 void SelectTool::drawResultSrcipt(QTime& t) {
-    auto shader = con<ShaderCtrl>().shader("selection",true);
-    auto view = con<ViewCtrl>().view();
+    auto shader = global::con<ShaderCtrl>().shader("selection");
+    auto view = global::con<ViewCtrl>().view();
     shader->bind();
-    shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
+    shader->setUniformValue("camera_vp", global::con<ViewCtrl>().view()->MatrixVP());
     gl.glEnable(GL_POLYGON_OFFSET_FILL);
     gl.glPolygonOffset(-1.0,-1.0);
-    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+    for(auto objectKV:global::con<InteractiveCtrl>().allObjects()){
         auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
         if(mesh == nullptr || mesh->selected_faces.size() == 0) continue;
-        shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
+        shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         mesh->drawElementBufferScript(mesh->selected_buffer,0,mesh->selected_faces.size());
     }
     shader->release();

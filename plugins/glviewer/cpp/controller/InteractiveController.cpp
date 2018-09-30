@@ -4,13 +4,25 @@
 #include "../bases/InteractiveObjectMesh.h"
 
 template<>
-LIBSHARED_EXPORT InteractiveCtrl& con<InteractiveCtrl>(){
-    return ICtrl<InteractiveCtrl>::getInstanceRef();
+LIBSHARED_EXPORT InteractiveCtrl& global::con<InteractiveCtrl>(){
+    return ICtrl<InteractiveCtrl>::getGrobalInstanceRef();
+}
+
+template<>
+LIBSHARED_EXPORT InteractiveCtrl& plugin::con<InteractiveCtrl>(){
+    return ICtrl<InteractiveCtrl>::getPluginInstanceRef();
 }
 
 InteractiveCtrl::InteractiveCtrl()
 {
 
+}
+
+InteractiveCtrl::~InteractiveCtrl()
+{
+    for(auto& e:objects){
+        delete e.second;
+    }
 }
 
 uint InteractiveCtrl::queryInteractiveId() {

@@ -15,6 +15,7 @@ class LIBSHARED_EXPORT InteractiveCtrl
 {
 public:
     InteractiveCtrl();
+    ~InteractiveCtrl();
     SelectTool mutable *selectTool;
     PickTool mutable *pickTool;
 
@@ -36,7 +37,7 @@ private:
     friend class ICtrl<InteractiveCtrl>;
     uint interactive_cnts = 0;
     std::map<std::string,uint> name2id;
-    std::map<uint,IDrawObject*> objects;
+    std::map<uint,IDrawObject* > objects;
     InteractiveObject* focus_object = nullptr;
 };
 

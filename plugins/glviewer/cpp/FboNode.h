@@ -26,9 +26,6 @@ public slots:
     void singleFacePick(int x,int y);
     void screenAreaPick(QQuickPaintedItem* provider);
 
-    void registerModule(QString module);
-    void unregisterModule(QString module);
-
     void axesVisible(bool status);
     void boxVisible(bool status);
 private:

@@ -11,9 +11,9 @@ RenderScript::RenderScript(RenderFunc f){
 #endif
     std::swap(name, static_name);
     if(name == "")
-        con<RenderCtrl>().addScript(std::move(*this));
+        global::con<RenderCtrl>().addScript(std::move(*this));
     else
-        con<RenderCtrl>().addScript(this);
+        global::con<RenderCtrl>().addScript(this);
 }
 
 void RenderScript::changeRender(RenderFunc &&f) {

@@ -39,7 +39,13 @@ glm::mat3 LIBSHARED_EXPORT YbMesh::slice::pca_analysic(std::vector<glm::vec3>& v
 //    std::cout << vec << std::endl;
 //    std::cout << val << std::endl;
 
-    return glm::make_mat3(vec.data());
+    auto crd = glm::make_mat3(vec.data());
+    if(abs(crd[0][0]) < abs(crd[0][1])) std::swap(crd[0],crd[1]);
+
+    for(auto i:{0,1,2}) {
+        crd[i] *= glm::dot(crd[i],glm::mat3()[i]) > 0?1:-1;
+    }
+    return crd;
 
 //    glm::mat3 coord = glm::make_mat3(vec.data());
 

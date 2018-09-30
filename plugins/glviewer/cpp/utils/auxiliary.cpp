@@ -6,8 +6,7 @@
 #include "../controller/RenderController.h"
 #include "../bases/InteractiveObjectMesh.h"
 void YbCore::aux::addCoord3d(float h, float r, std::string name) {
-    auto triMesh = YbMesh::geometry::make_axes(h,r);
-    auto object = new IDrawObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    auto object = new IDrawObject(YbMesh::geometry::make_axes(h,r));
     object->normalize(false);
     object->calculateNorm();
     RenderScript([=](QTime&) {
@@ -15,12 +14,12 @@ void YbCore::aux::addCoord3d(float h, float r, std::string name) {
         object->syncVertexBuffersDataScript();
         object->syncFacesBuffersDataScript();
     });
-    con<InteractiveCtrl>().addInteractiveObject(name, object);
+    global::con<InteractiveCtrl>().addInteractiveObject(name, object);
 
     new(name) RenderScript([=](QTime&) {
-        auto shader = con<ShaderCtrl>().shader("axes",true);
-        auto view = con<ViewCtrl>().view();
-        auto object = con<InteractiveCtrl>().object(name);
+        auto shader = global::con<ShaderCtrl>().shader("axes");
+        auto view = global::con<ViewCtrl>().view();
+        auto object = global::con<InteractiveCtrl>().object(name);
         if(object->visible == false) return;
         int axes = object->m_v.f().size()/3;
         shader->bind();
@@ -38,8 +37,7 @@ void YbCore::aux::addCoord3d(float h, float r, std::string name) {
 //    YbMesh::IO::writePartialMesh(object->m_v, *f, cylinder_file);
 }
 void YbCore::aux::addBox3d(float h, float r, std::string name) {
-    auto triMesh = YbMesh::geometry::make_box(h,r);
-    auto object = new IDrawObject(triMesh,YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),triMesh.f()));
+    auto object = new IDrawObject(YbMesh::geometry::make_box(h,r));
     object->normalize();
     object->calculateNorm();
     RenderScript([=](QTime&) {
@@ -47,12 +45,12 @@ void YbCore::aux::addBox3d(float h, float r, std::string name) {
         object->syncVertexBuffersDataScript();
         object->syncFacesBuffersDataScript();
     });
-    con<InteractiveCtrl>().addInteractiveObject(name, object);
+    global::con<InteractiveCtrl>().addInteractiveObject(name, object);
 
     new(name) RenderScript([=](QTime&) {
-        auto shader = con<ShaderCtrl>().shader("core",true);
-        auto view = con<ViewCtrl>().view();
-        auto object = con<InteractiveCtrl>().object(name);
+        auto shader = global::con<ShaderCtrl>().shader("core");
+        auto view = global::con<ViewCtrl>().view();
+        auto object = global::con<InteractiveCtrl>().object(name);
         if(object->visible == false) return;
         shader->bind();
         shader->setUniformValue("camera_vp", view->MatrixVP());

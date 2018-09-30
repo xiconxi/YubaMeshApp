@@ -25,15 +25,15 @@ void PickTool::pickScript() {
 
     gl.glClearColor(-1.0f, 0.0f, 0.0f, 1.0f);
     gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    auto shader = con<ShaderCtrl>().shader("picker",true);
-    auto view = con<ViewCtrl>().view();
+    auto shader = global::con<ShaderCtrl>().shader("picker");
+    auto view = global::con<ViewCtrl>().view();
     shader->bind();
-    shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
+    shader->setUniformValue("camera_vp", global::con<ViewCtrl>().view()->MatrixVP());
 
-    for(auto objectKV:con<InteractiveCtrl>().allObjects()){
+    for(auto objectKV:global::con<InteractiveCtrl>().allObjects()){
         auto mesh = objectKV.second;
         if(mesh->visible == false) continue;
-        shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
+        shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();
     }
@@ -62,11 +62,11 @@ void PickTool::drawResult(QTime& t) {
     for(auto& e:visible_picks) {
         gl.glEnable(GL_POLYGON_OFFSET_FILL);
         gl.glPolygonOffset(-1.0,-1.0);
-        auto shader = con<ShaderCtrl>().shader("selection",true);
-        auto mesh   = con<InteractiveCtrl>().object(e[0]);
+        auto shader = global::con<ShaderCtrl>().shader("selection");
+        auto mesh   = global::con<InteractiveCtrl>().object(e[0]);
         shader->bind();
-        shader->setUniformValue("camera_vp", con<ViewCtrl>().view()->MatrixVP());
-        shader->setUniformValue("model", con<ViewCtrl>().view()->Model()*mesh->Model());
+        shader->setUniformValue("camera_vp", global::con<ViewCtrl>().view()->MatrixVP());
+        shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         mesh->drawElementScript(e[1], 1);
         shader->release();
         gl.glDisable(GL_POLYGON_OFFSET_FILL);
@@ -78,7 +78,7 @@ void PickTool::createBufferScript() {
     gl.glGenRenderbuffers(2, this->m_rbo);
 }
 void PickTool::sizingScreenBufferScript() {
-    auto size = con<RenderCtrl>().frameBufferObject().size();
+    auto size = global::con<RenderCtrl>().frameBufferObject().size();
     int pre_fbo = 0;
     gl.glGetIntegerv(GL_FRAMEBUFFER_BINDING, &pre_fbo);
 
@@ -126,9 +126,9 @@ void PickTool::meshPick(int x, int y) {
     RenderScript([&](QTime& t){
         pickScript();
         if(visible_picks.size())
-            con<InteractiveCtrl>().focus(con<InteractiveCtrl>().interactiveObject(visible_picks[0][0]));
+            global::con<InteractiveCtrl>().focus(global::con<InteractiveCtrl>().interactiveObject(visible_picks[0][0]));
         else
-            con<InteractiveCtrl>().focus(nullptr);
+            global::con<InteractiveCtrl>().focus(nullptr);
         clearPicks();
     });
 }

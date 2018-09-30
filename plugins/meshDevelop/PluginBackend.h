@@ -3,16 +3,7 @@
 
 #include <YbCore/controller>
 
-class ScanRender;
-
-class VertexClusterMeshObject: public IDrawObject {
-public:
-    VertexClusterMeshObject(TriMesh vmesh,TriMesh nmesh,int components);
-    // GL functions
-    void syncVertexBuffersDataScript() override;
-
-    std::vector<int> vertex_cluster;
-};
+class ComponentsRender;
 
 class PluginBackend : public IPluginBackend
 {
@@ -25,7 +16,7 @@ public:
 
     bool importMesh(std::string url,std::string name) override;
 private:
-    ScanRender* render_s;
+    ComponentsRender* components_render;
 };
 
 #endif // PLUGINBACKEND_H

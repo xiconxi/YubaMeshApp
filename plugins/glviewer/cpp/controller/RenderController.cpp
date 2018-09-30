@@ -10,8 +10,8 @@
 #include "../utils/ScriptSamples.h"
 
 template<>
-LIBSHARED_EXPORT RenderCtrl& con<RenderCtrl>(){
-    return ICtrl<RenderCtrl>::getInstanceRef();
+LIBSHARED_EXPORT RenderCtrl& global::con<RenderCtrl>(){
+    return ICtrl<RenderCtrl>::getGrobalInstanceRef();
 }
 
 void RenderCtrl::addScript(RenderScript&& op) {
@@ -23,15 +23,13 @@ void RenderCtrl::addScript(RenderScript&& op) {
 
 void RenderCtrl::addScript(RenderScript* op) {
     named_lock.lockForWrite();
-    LOG(INFO)<< "Script(Add): " << con<CentralCtrl>().module()+op->name;
-    named_script[con<CentralCtrl>().module()+op->name] = op;
-    con<CentralCtrl>().resourceHook(CentralCtrl::RENDER,op->name);
+    named_script[op->name] = op;
     named_lock.unlock();
     update();
 }
 
 RenderCtrl::RenderCtrl(){
-    con<CentralCtrl>().initialGLFunctions();
+    global::con<CentralCtrl>().initialGLFunctions();
 }
 
 QOpenGLFramebufferObject* RenderCtrl::createFramebufferObject(const QSize &size){
@@ -40,8 +38,8 @@ QOpenGLFramebufferObject* RenderCtrl::createFramebufferObject(const QSize &size)
     format.setSamples(4);
     frame_buffer = new QOpenGLFramebufferObject(size, format);
 
-    con<ViewCtrl>().updateSize(size.width(), size.height());
-    con<InteractiveCtrl>().pickTool->sizingScreenBufferScript();
+    global::con<ViewCtrl>().updateSize(size.width(), size.height());
+    global::con<InteractiveCtrl>().pickTool->sizingScreenBufferScript();
     return  frame_buffer;
 }
 
@@ -51,7 +49,7 @@ const QOpenGLFramebufferObject& RenderCtrl::frameBufferObject() const{
 
 void RenderCtrl::render() {
     auto curr_time = QTime::currentTime();
-    ((FboNode*)con<CentralCtrl>().GLNode())->set_fps(curr_time.second());
+    ((FboNode*)global::con<CentralCtrl>().GLNode())->set_fps(curr_time.second());
     QQuickFramebufferObject::Renderer::update();
     if(!this->render_volatile) return ;
 

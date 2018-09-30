@@ -2,6 +2,7 @@
 #include <numeric>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <easylogging++.h>
 
 void LIBSHARED_EXPORT YbMesh::visualization::calculateNorm(indicesTriMesh<glm::vec3>& vMesh, indicesTriMesh<glm::vec3>& nMesh){
     auto& v = vMesh.v();
@@ -36,4 +37,15 @@ glm::mat4 LIBSHARED_EXPORT YbMesh::visualization::normalize(indicesTriMesh<glm::
     return  glm::scale(glm::mat4(), glm::vec3(1.4 / std::sqrt(std::accumulate(v.begin(), v.end(), 0.0,[=](float s, glm::vec3& e){
         return std::max<float>(s,std::powf(glm::length(centerlized?e:e-center),2) );
     }))));
+}
+
+glm::mat4 LIBSHARED_EXPORT YbMesh::visualization::boundingBox(indicesTriMesh<glm::vec3>& vMesh, glm::mat3 crd) {
+    glm::vec3 scales;
+    for(auto i:{0,1,2}) {
+        auto minmax = std::minmax_element(vMesh.v().begin(), vMesh.v().end(), [=](glm::vec3& e1, glm::vec3 e2){
+            return glm::dot(e2-e1,crd[i]) > 0;
+        });
+        scales[i] = abs(glm::dot(*minmax.first - *minmax.second,crd[i]))/(2.0f/1.4f);
+    }
+    return glm::scale(glm::mat4(), scales);
 }

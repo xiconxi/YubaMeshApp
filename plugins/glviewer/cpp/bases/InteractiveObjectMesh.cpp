@@ -23,6 +23,10 @@ void IModelTransform::scaleBy(float s) {
     model = glm::scale(glm::mat4(), (1+s)*glm::vec3(1,1,1)) * model;
 }
 
+IDrawObject::IDrawObject(TriMesh&& vmesh, int _components):m_v(vmesh),components(_components, _components == 1? m_v.f().size():0),
+            m_n(YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),m_v.shared_f())){
+}
+
 void IDrawObject::createBufferScript() {
     gl.glGenVertexArrays(1, &vao);
     gl.glGenBuffers(1, &v_buffer);
@@ -86,7 +90,17 @@ void IDrawObject::normalize(bool centralized) {
     model = YbMesh::visualization::normalize(m_v,centralized);
 }
 
-InteractiveObject::InteractiveObject(TriMesh vmesh,TriMesh nmesh,int components):IDrawObject(vmesh,nmesh,components),QObject(nullptr){
+IDrawObject::~IDrawObject(){
+    gl.glDeleteVertexArrays(1, &vao);
+    gl.glDeleteBuffers(1, &v_buffer);
+    gl.glDeleteBuffers(1, &ibo);
+}
+
+InteractiveObject::~InteractiveObject() {
+    gl.glDeleteBuffers(1, &selected_buffer);
+}
+
+InteractiveObject::InteractiveObject(TriMesh&& vmesh, int components):QObject(nullptr),IDrawObject(std::move(vmesh), components){
 
 }
 
@@ -96,11 +110,7 @@ void InteractiveObject::createBufferScript() {
 }
 
 void InteractiveObject::syncSelectBufferScript() {
-    con<InteractiveCtrl>().selectTool->syncBufferScript(this);
-}
-
-InteractiveObject::~InteractiveObject(){
-
+    global::con<InteractiveCtrl>().selectTool->syncBufferScript(this);
 }
 
 void InteractiveObject::downloadSelectedBufferScript(int buffer_size) {
