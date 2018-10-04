@@ -9,6 +9,7 @@ public:
 // test
     static void test1(QTime& t);
     static RenderFunc test2;
+    static RenderFunc nullRender;
 };
 typedef defaultScript Script;
 }

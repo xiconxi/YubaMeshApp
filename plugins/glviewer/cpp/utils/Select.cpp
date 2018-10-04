@@ -43,6 +43,31 @@ void SelectTool::SelectScript(QTime& t) {
         if(stream_size[0] > 0)
             emit mesh->FaceSelected(mesh);
     }
+    for(auto objectKV:plugin::con<InteractiveCtrl>().allObjects()){
+        auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
+        if(mesh == nullptr || mesh->visible == false) continue;
+        this->beginStreamQueryScript();
+
+        shader->setUniformValue("model", view->Model()*mesh->Model());
+        gl.glBindTexture(GL_TEXTURE_2D, areaItem->textureProvider()->texture()->textureId());
+
+        gl.glEnable(GL_RASTERIZER_DISCARD);
+        gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, xfb);
+        gl.glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,mesh->selected_buffer);
+        gl.glBeginTransformFeedback(GL_POINTS);
+
+        mesh->drawElementScript();
+
+        gl.glDisable(GL_RASTERIZER_DISCARD);
+        gl.glEndTransformFeedback();
+        gl.glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+
+        this->endStreamQueryScript();
+        mesh->downloadSelectedBufferScript(stream_size[0]);
+
+        if(stream_size[0] > 0)
+            emit mesh->FaceSelected(mesh);
+    }
     shader->release();
 }
 
@@ -54,6 +79,12 @@ void SelectTool::drawResultSrcipt(QTime& t) {
     gl.glEnable(GL_POLYGON_OFFSET_FILL);
     gl.glPolygonOffset(-1.0,-1.0);
     for(auto objectKV:global::con<InteractiveCtrl>().allObjects()){
+        auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
+        if(mesh == nullptr || mesh->selected_faces.size() == 0) continue;
+        shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
+        mesh->drawElementBufferScript(mesh->selected_buffer,0,mesh->selected_faces.size());
+    }
+    for(auto objectKV:plugin::con<InteractiveCtrl>().allObjects()){
         auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
         if(mesh == nullptr || mesh->selected_faces.size() == 0) continue;
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());

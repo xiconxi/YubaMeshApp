@@ -4,6 +4,8 @@
 #include <YbCore/controller>
 
 class ComponentsRender;
+class WhirlwindRender;
+class GridTextureRender;
 
 class PluginBackend : public IPluginBackend
 {
@@ -17,6 +19,8 @@ public:
     bool importMesh(std::string url,std::string name) override;
 private:
     ComponentsRender* components_render;
+    WhirlwindRender* whirlwind_render;
+    GridTextureRender* gridtexture_render;
 };
 
 #endif // PLUGINBACKEND_H

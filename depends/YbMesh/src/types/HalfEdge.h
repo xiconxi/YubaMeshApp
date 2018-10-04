@@ -31,14 +31,15 @@ public:
     SharedHalfEdge(IMesh& imesh);
     static SharedHalfEdge* ptr;
 
-    std::vector<IHalfEdge> edges;
-    std::vector<Vert> verts;
-
-    std::vector<int> findex;
-
     IHalfEdgeIt edge(int f);
 
     IMesh toMesh();
+
+    int rerange(std::vector<int>&& borders);
+
+    std::vector<IHalfEdge> edges;
+    std::vector<Vert> verts;
+    std::vector<int> findex;
 
 private:
 
@@ -50,13 +51,13 @@ struct IHalfEdge{
     IHalfEdge(int from, int to):_pair(-1),_to(to),_from(from){}
     IHalfEdgeIt next();
     IHalfEdgeIt pair();
+    int face();
     VertIt to();
     VertIt from();
     glm::vec3 vector();
-    int _next, _pair, _face, _to;
+    int _next, _pair, _face, _from, _to;
 
 private:
-    int _from; // mostly used for caclulate _pair
     friend class SharedHalfEdge;
 };
 

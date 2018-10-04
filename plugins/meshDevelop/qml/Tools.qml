@@ -12,6 +12,7 @@ Item {
     }
 
     ListView{
+//       visible: false
        y: 100
        anchors.horizontalCenter: parent.horizontalCenter
        height: 300

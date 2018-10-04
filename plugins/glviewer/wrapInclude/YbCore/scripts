@@ -1,6 +1,7 @@
 #ifndef SCRIPTS_H
 #define SCRIPTS_H
-//#include "../cpp/utils/ScriptSamples.h"
+
+#include "../cpp/utils/ScriptSamples.h"
 
 #define LIBSHARED_EXPORT Q_DECL_IMPORT
 #endif // SCRIPTS_H

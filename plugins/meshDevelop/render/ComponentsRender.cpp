@@ -5,7 +5,8 @@
 #include "PluginBackend.h"
 
 ComponentsRender::ComponentsRender(TriMesh&& vmesh,int components):
-    IDrawObject(std::move(vmesh),components),vertex_cluster(vmesh.v().size(),0),
+    IDrawObject(std::move(vmesh),components),
+    vertex_cluster(vmesh.v().size(),0),
     RenderScript(std::bind(&ComponentsRender::draw, this, std::placeholders::_1))
 {
     this->normalize();
@@ -41,7 +42,7 @@ void ComponentsRender::componetAnalysic(){
         z_dots[i] = glm::dot(triMesh.v()[i], pca[2]);
 
     double mean_dis = std::sqrt(std::accumulate(triMesh.v().begin(),triMesh.v().end(), 0.0, [=](double acc, glm::vec3& e){
-                        return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);})/triMesh.v().size());
+                        return acc+std::powf(glm::length(e-pca[2]*glm::dot(e, pca[2]) ),2);})/triMesh.v().size())*0.9f;
 
     std::vector<std::array<float,2>> ratio_intervals = {
         {glm::mix(Z[0],Z[1],0.00), glm::mix(Z[0],Z[1],0.42)}, // 腿

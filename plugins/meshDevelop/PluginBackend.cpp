@@ -1,6 +1,9 @@
 #include "PluginBackend.h"
 #include <QStandardPaths>
-#include "ComponentsRender.h"
+#include "./render/ComponentsRender.h"
+#include "./render/WhirlwindRender.h"
+#include "./render/GridTextureRender.h"
+
 #define PI 3.1415926f
 PluginBackend::PluginBackend()
 {
@@ -13,9 +16,12 @@ void PluginBackend::construction() {
         QString prefix = PLUGINPATH"MeshDevelop/shaders/";
        // con<ShaderCtrl>().addShaderProgram("texture", shaderConfig{ V(prefix+"texture"),G(prefix+"texture"),F(prefix+"texture") });
         plugin::con<ShaderCtrl>().addShaderProgram({{"base", GLSLFileConfig{ V(prefix+"indices"),F(prefix+"indices") },nullptr}});
+        plugin::con<ShaderCtrl>().addShaderProgram({{"grid_tex", GLSLFileConfig{ V(prefix+"grid_tex"),F(prefix+"grid_tex") },nullptr}});
     });
 //    importMesh(MESHPATH"bunny.obj","bunny");
-    importMesh(MESHPATH"body2.obj","body2");
+//    importMesh(MESHPATH"body2.obj","body2");
+
+    importMesh("/Users/hotpot/data/mesh_data/body2_head.obj","ptex");
 
 //    if(render_s == nullptr)
 //        render_s = new("render") ScanRender;
@@ -32,19 +38,23 @@ void PluginBackend::draw_for(QString value) {
 
 }
 
-///
-/// \brief invincibleWhirlwindTriangle
-/// \param mesh
-/// 三角网格面元螺旋展开(面元的全排序)
-void invincibleWhirlwindTriangle(YbMesh::indicesTriMesh<glm::vec3>& mesh) {
-    auto half = YbMesh::SharedHalfEdge(mesh);
-}
-
 bool PluginBackend::importMesh(std::string url,std::string name){
     // 人体部件划分
-    components_render = new("Components") ComponentsRender(YbMesh::IO::importOBJ_V0(url),8);
+//    components_render = new("Components") ComponentsRender(YbMesh::IO::importOBJ_V0(url),8);
 
-    plugin::con<InteractiveCtrl>().addInteractiveObject(name, components_render);
+//    plugin::con<InteractiveCtrl>().addInteractiveObject(name, components_render);
+
+//    auto mesh = YbMesh::IO::importOBJ_V0(url);
+//    invincibleWhirlwindTriangle(mesh);
+//    whirlwind_render = new("Whirwind") WhirlwindRender(std::move(mesh));
+//    plugin::con<InteractiveCtrl>().addInteractiveObject(name, whirlwind_render);
+
+    auto mesh = YbMesh::IO::importOBJ_V0(url);
+    gridtexture_render = new ("gridTex") GridTextureRender(mesh);
+    plugin::con<InteractiveCtrl>().addInteractiveObject(name, gridtexture_render);
+
+    global::con<InteractiveCtrl>().object("axes")->visible = false;
+    global::con<InteractiveCtrl>().object("box")->visible = false;
 
     return true;
 }

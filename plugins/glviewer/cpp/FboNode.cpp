@@ -44,7 +44,7 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
        {"core"  ,GLSLFileConfig{V(prefix+"default"),F(prefix+"default")},nullptr},
        {"axes",GLSLFileConfig{V(prefix+"tex_axes"),F(prefix+"tex_axes")},nullptr},
        {"selection",GLSLFileConfig{V(prefix+"default"),F(prefix+"selection")},nullptr},
-       {"selection",GLSLFileConfig{V(prefix+"select_mask"),G(prefix+"select_mask")},[](GLuint id){
+       {"select",GLSLFileConfig{V(prefix+"select_mask"),G(prefix+"select_mask")},[](GLuint id){
             const char* select_varing[] = {"face"};
             gl.glTransformFeedbackVaryings(id, 1, select_varing ,GL_INTERLEAVED_ATTRIBS);
         }}

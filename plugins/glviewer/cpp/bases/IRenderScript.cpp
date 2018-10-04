@@ -16,7 +16,7 @@ RenderScript::RenderScript(RenderFunc f){
         global::con<RenderCtrl>().addScript(this);
 }
 
-void RenderScript::changeRender(RenderFunc &&f) {
+void RenderScript::setRender(RenderFunc &&f) {
 #ifdef GL_ERROR_HOOK
     m_render = f;
 #else

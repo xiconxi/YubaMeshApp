@@ -8,6 +8,8 @@ RenderFunc YbCore::defaultScript::test2 = [](QTime& t){
     LOG(INFO) << "test YbCore::test passed. ";
 };
 
+RenderFunc YbCore::defaultScript::nullRender = [](QTime& t){};
+
 void YbCore::defaultScript::clear(QTime &t) {
     gl.glEnable(GL_DEPTH_TEST);
     gl.glClearColor(0.2, 0.3, 0.3, 1.0);

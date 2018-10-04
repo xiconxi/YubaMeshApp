@@ -21,7 +21,9 @@
 #endif
 
 namespace YbMesh {
-using std::vector;
+    using std::vector;
+    template <class T>
+    using share_vec =  std::shared_ptr<std::vector<T>>;
     template <class T>
     struct indicesTriMesh
     {
@@ -48,6 +50,7 @@ using std::vector;
         std::shared_ptr<vector<T>> vp;
         std::shared_ptr<vector<glm::ivec3>> fp;
     };
+
 }
 
 

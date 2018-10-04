@@ -1,7 +1,6 @@
 #ifndef COMPONENTSRENDER_H
 #define COMPONENTSRENDER_H
 
-
 #include <QObject>
 #include <YbCore/controller>
 #include <glm/vec2.hpp>
@@ -19,7 +18,6 @@ public:
     std::vector<int> vertex_cluster;
 
 private:
-    float percent = 0;
     void draw(QTime& t);
     void componetAnalysic();
 

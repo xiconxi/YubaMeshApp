@@ -16,9 +16,9 @@ PluginBackend::PluginBackend(IPluginBackend* parent)
 
 void PluginBackend::workMode(QString mode) {
     if(mode == "scan")
-        render_s->changeRender(std::bind(&SliceRender::scanLineAnimation, render_s, std::placeholders::_1));
+        render_s->setRender(std::bind(&SliceRender::scanLineAnimation, render_s, std::placeholders::_1));
     else if(mode == "pick")
-        render_s->changeRender(std::bind(&SliceRender::drawModelWithSlice, render_s, std::placeholders::_1));
+        render_s->setRender(std::bind(&SliceRender::drawModelWithSlice, render_s, std::placeholders::_1));
     global::con<RenderCtrl>().update();
 }
 
@@ -96,7 +96,12 @@ bool PluginBackend::importMesh(std::string url,std::string name){
         object->createBufferScript();
         object->syncVertexBuffersDataScript();
         object->syncFacesBuffersDataScript();
-//        object->syncSelectBufferScript();
+        object->syncSelectBufferScript();
+    });
+    QObject::connect(object,&InteractiveObject::FaceSelected, object, [=](InteractiveObject* mesh){
+        auto select_file = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString()+"/body2_head2.obj";
+        LOG(INFO) << select_file;
+        YbMesh::IO::writePartialMesh(mesh->m_v, mesh->selectedFaces(), select_file);
     });
     plugin::con<InteractiveCtrl>().addInteractiveObject(name, object);
 

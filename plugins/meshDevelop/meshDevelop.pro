@@ -14,13 +14,17 @@ INCLUDEPATH += \
 SOURCES += \
     develop_plugin.cpp \
     PluginBackend.cpp \
-    ComponentsRender.cpp
+    render/ComponentsRender.cpp \
+    render/WhirlwindRender.cpp \
+    render/GridTextureRender.cpp
 
 HEADERS += \
     develop_plugin.h \
     svpng.inc \
     PluginBackend.h \
-    ComponentsRender.h
+    render/ComponentsRender.h \
+    render/WhirlwindRender.h \
+    render/GridTextureRender.h
 
 CONFIG(release, debug|release): {
     DESTDIR = ../../modules/$$TARGET

@@ -61,6 +61,10 @@ void IDrawObject::drawElementScript(uint start, uint size) {
     drawElementBufferScript(ibo,start,size);
 }
 
+IDrawObject::_::_(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0) {
+    update();
+}
+
 void IDrawObject::_::update() {
     for(int i = 0; i < intervals.size(); i++) {
         counts[i] = (intervals[i][1] > 0?(intervals[i][1] - intervals[i][0]):0)*3;

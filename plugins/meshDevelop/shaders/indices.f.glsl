@@ -1,7 +1,6 @@
 #version 410
 out vec4 color;
 in vec3 wnorm;
-in float z_deepth;
 in vec3 base_color;
 void main()
 {

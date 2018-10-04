@@ -37,6 +37,14 @@ void PickTool::pickScript() {
         shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();
     }
+    for(auto objectKV:plugin::con<InteractiveCtrl>().allObjects()){
+        auto mesh = objectKV.second;
+        if(mesh->visible == false) continue;
+        shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
+        shader->setUniformValue("mesh_id",(float)objectKV.first);
+        mesh->drawElementScript();
+    }
+
     shader->release();
 
     gl.glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
@@ -47,7 +55,7 @@ void PickTool::pickScript() {
 //        LOG(INFO) <<" screen_coords : " << e[0] << ' ' << e[1];
         gl.glReadPixels(e[0], e[1], 1, 1, GL_RED, GL_FLOAT, rgb);
         gl.glReadPixels(e[0], e[1], 1, 1, GL_GREEN, GL_FLOAT, rgb+1);
-//        LOG(INFO) <<" rgb : " << rgb[0] << ' ' << rgb[1];
+        LOG(INFO) <<" rgb : " << rgb[0] << ' ' << rgb[1];
         if(rgb[0] != -1)
             if(rgb[0] > -1.0f)
                 visible_picks.push_back({(int)rgb[0],(int)rgb[1]});

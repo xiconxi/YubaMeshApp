@@ -41,7 +41,7 @@ public:
     YbMesh::indicesTriMesh<glm::vec3> m_n;
 
     struct LIBSHARED_EXPORT _{
-        _(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0){}
+        _(int s,int ss);
         std::vector<glm::ivec2> intervals;
         void update();
     private:

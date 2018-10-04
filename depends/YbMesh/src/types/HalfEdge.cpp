@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <vector>
+#include <iterator>
 #include "HalfEdge.h"
 
 #define SORT_OPTIMIZATION
@@ -72,6 +73,40 @@ SharedHalfEdge::SharedHalfEdge(IMesh &mesh): edges(mesh.f().size()*3),
     std::cout<<"border face: " << cnt << std::endl;
 }
 
+int SharedHalfEdge::rerange(std::vector<int>&& border) {
+
+//    std::vector<Vert> range_verts(verts.size());
+//    std::vector<int> old_ref(verts.size(),-1);
+//    for(int i = 0; i < border.size(); i++) {
+//        range_verts[i] = verts[border[i]];
+//        old_ref[border[i]] = i;
+//    }
+//    for(int i = 0, ii = border.size(); i < verts.size(); i++, ii++) {
+//        while(i < verts.size() && old_ref[i] != -1) i++;
+//        range_verts[ii] = verts[i];
+//        old_ref[i] = ii;
+//    }
+//    for(auto& e:edges){
+//        e._from = old_ref[e._from];
+//        e._to = old_ref[e._to];
+//    }
+//    std::swap(range_verts, verts);
+
+    std::vector<int> to_sorted(verts.size());
+    for(int i = 0; i < to_sorted.size(); i++) to_sorted[i] = i;
+    for(int i = 0; i < border.size(); i++) {
+        std::swap(to_sorted[i], to_sorted[border[i]]);
+        std::swap(verts[i],verts[border[i]]);
+    }
+    for(auto& e:edges){
+        e._from = to_sorted[e._from];
+        e._to = to_sorted[e._to];
+    }
+
+
+    return border.size();
+}
+
 
 IMesh SharedHalfEdge::toMesh() {
     auto vs = std::make_shared<std::vector<glm::vec3>>();
@@ -110,6 +145,10 @@ VertIt IHalfEdge::to() {
 
 VertIt IHalfEdge::from() {
     return SharedHalfEdge::ptr->verts.begin()+_from;
+}
+
+int IHalfEdge::face() {
+    return _face;
 }
 
 glm::vec3 IHalfEdge::vector() {
