@@ -64,6 +64,10 @@ wireframe
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/components.gif)
 
+网格全排序(螺旋展开效果)
+
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/bunny.gif)
+
 网格固定边界参数化
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/20181004-100714.png)
