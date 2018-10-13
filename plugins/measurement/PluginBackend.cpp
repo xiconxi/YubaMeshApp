@@ -41,7 +41,7 @@ void PluginBackend::construction() {
 
 float PluginBackend::sliceInRatio(float ratio) {
     float dis = glm::mix(render_s->bounding_z[0],render_s->bounding_z[1],ratio);
-    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody")->m_v;
+    auto mesh = plugin::con<GLMeshCtrl>().object("scanbody")->m_v;
     auto interval = YbMesh::slice::getSliceInterval(mesh, norm, dis, gap);
     std::vector<std::array<glm::vec3,2>> slice_res;
     for(auto it = interval[0]; it != interval[1]; it++) {
@@ -50,7 +50,7 @@ float PluginBackend::sliceInRatio(float ratio) {
         }
     }
     auto view = global::con<ViewCtrl>().view();
-    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<InteractiveCtrl>().object("scanbody")->model;
+    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<GLMeshCtrl>().object("scanbody")->model;
     std::vector<float> girths;
 
     auto& v = mesh.v();
@@ -103,13 +103,13 @@ bool PluginBackend::importMesh(std::string url,std::string name){
         LOG(INFO) << select_file;
         YbMesh::IO::writePartialMesh(mesh->m_v, mesh->selectedFaces(), select_file);
     });
-    plugin::con<InteractiveCtrl>().addInteractiveObject(name, object);
+    plugin::con<GLMeshCtrl>().addInteractiveObject(name, object);
 
     return true;
 }
 
 float PluginBackend::slice(float dis) {
-    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody")->m_v;
+    auto mesh = plugin::con<GLMeshCtrl>().object("scanbody")->m_v;
     auto interval = YbMesh::slice::getSliceInterval(mesh, norm, dis, gap);
     std::vector<std::array<glm::vec3,2>> slice_res;
     for(auto it = interval[0]; it != interval[1]; it++) {
@@ -118,7 +118,7 @@ float PluginBackend::slice(float dis) {
         }
     }
     auto view = global::con<ViewCtrl>().view();
-    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<InteractiveCtrl>().object("scanbody")->model;
+    auto mvp  = view->matrixVP()*view->model()* glm::rotate(glm::mat4(),-3.1415926f*0.5f,glm::vec3(1,0,0))*plugin::con<GLMeshCtrl>().object("scanbody")->model;
     float w = canvas->width();
     float h = canvas->height();
     std::vector<float> girths;
@@ -143,12 +143,12 @@ float PluginBackend::slice(float dis) {
 }
 
 void PluginBackend::slice(int x, int y) {
-    int f_id = global::con<InteractiveCtrl>().pickTool->getSingleFacePick(x,y);
+    int f_id = global::con<GLMeshCtrl>().pickTool->getSingleFacePick(x,y);
     if(f_id == -1) {
          canvas->update();
          return ;
     }
-    auto mesh = plugin::con<InteractiveCtrl>().object("scanbody");
+    auto mesh = plugin::con<GLMeshCtrl>().object("scanbody");
     auto& v = mesh->m_v.v();
     auto& f = mesh->m_v.f();
     render_s->dis = glm::dot(norm, (v[f[f_id][0]]+v[f[f_id][1]]+v[f[f_id][2]])/3.0f);

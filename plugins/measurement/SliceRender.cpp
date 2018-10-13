@@ -12,7 +12,7 @@ void SliceRender::updateDis(float value) {
 }
 
 void SliceRender::drawModelWithSlice(QTime &t) {
-    auto mesh = plugin::con<InteractiveCtrl>().focus();
+    auto mesh = plugin::con<GLMeshCtrl>().focus();
     auto shader = plugin::con<ShaderCtrl>().shader("base");
     auto view = global::con<ViewCtrl>().view();
     if(mesh == nullptr || shader == nullptr) return;
@@ -30,7 +30,7 @@ void SliceRender::scanLineAnimation(QTime &t) {
     gl.glEnable(GL_DEPTH_TEST);
     gl.glClearColor(0.2, 0.3, 0.3, 1.0);
     gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    auto mesh = global::con<InteractiveCtrl>().focus();
+    auto mesh = global::con<GLMeshCtrl>().focus();
     auto shader = plugin::con<ShaderCtrl>().shader("base");
     auto view = global::con<ViewCtrl>().view();
     if(mesh == nullptr || shader == nullptr) return;

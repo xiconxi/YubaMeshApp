@@ -67,7 +67,7 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
 
     YbCore::aux::addCoord3d(1.0f,0.01f,"axes");
     YbCore::aux::addBox3d(10.0f,0.1f,"box");
-    YbCore::aux::addInteractiveFaceTexDemo("/Users/hotpot/data/007/007.obj", "demo");
+//    YbCore::aux::addInteractiveFaceTexDemo("/Users/hotpot/data/007/007.obj", "demo");
 //    YbCore::aux::addInteractiveDemo("/Users/hotpot/data/007/007.obj", "demo");
 
     return ret;
