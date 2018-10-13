@@ -158,16 +158,14 @@ namespace paramarization {
 
 }
 
-GridTextureRender::GridTextureRender(TriMesh& mesh):IDrawObject(std::move(mesh)),
+GridTextureRender::GridTextureRender(TriMesh& mesh):IGLMeshObject(std::move(mesh)),
     vt_p(paramarization::fixBoundParamarization(mesh)),
     RenderScript(YbCore::defaultScript::nullRender)
 {
     this->normalize();
     this->calculateNorm();
-
     RenderScript([this](QTime&) {
-        auto tex = QImage("/Users/hotpot/Downloads/wechat_head.jpg");
-        this->texture = new  QOpenGLTexture(tex);
+        this->texture = new  QOpenGLTexture(QImage("/Users/hotpot/Downloads/wechat_head.jpg"));
         this->texture->bind();
         this->texture->setMinificationFilter(QOpenGLTexture::Nearest);
         this->texture->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -187,7 +185,6 @@ void GridTextureRender::draw(QTime &t) {
     shader->bind();
     shader->setUniformValue("camera_vp", view->MatrixVP());
     shader->setUniformValue("model", view->Model()*this->Model());
-    texture->bind();
     this->drawElementScript();
     texture->release();
     shader->release();

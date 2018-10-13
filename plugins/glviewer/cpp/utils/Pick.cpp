@@ -1,12 +1,12 @@
 #include "Pick.h"
 #include "../controller/ViewController.h"
 #include "../controller/ShaderController.h"
-#include "../controller/InteractiveController.h"
+#include "../controller/GLMeshController.h"
 #include <easylogging++.h>
 #include <iostream>
 #include <QSGTextureProvider>
 #include <QOpenGLFramebufferObject>
-#include "../bases/InteractiveObjectMesh.h"
+#include "../bases/GLMeshObject.h"
 
 PickTool::PickTool():RenderScript(std::bind(&PickTool::drawResult, this, std::placeholders::_1))
 {
@@ -30,14 +30,14 @@ void PickTool::pickScript() {
     shader->bind();
     shader->setUniformValue("camera_vp", global::con<ViewCtrl>().view()->MatrixVP());
 
-    for(auto objectKV:global::con<InteractiveCtrl>().allObjects()){
+    for(auto objectKV:global::con<GLMeshCtrl>().allObjects()){
         auto mesh = objectKV.second;
         if(mesh->visible == false) continue;
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();
     }
-    for(auto objectKV:plugin::con<InteractiveCtrl>().allObjects()){
+    for(auto objectKV:plugin::con<GLMeshCtrl>().allObjects()){
         auto mesh = objectKV.second;
         if(mesh->visible == false) continue;
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
@@ -71,7 +71,7 @@ void PickTool::drawResult(QTime& t) {
         gl.glEnable(GL_POLYGON_OFFSET_FILL);
         gl.glPolygonOffset(-1.0,-1.0);
         auto shader = global::con<ShaderCtrl>().shader("selection");
-        auto mesh   = global::con<InteractiveCtrl>().object(e[0]);
+        auto mesh   = global::con<GLMeshCtrl>().object(e[0]);
         shader->bind();
         shader->setUniformValue("camera_vp", global::con<ViewCtrl>().view()->MatrixVP());
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
@@ -134,9 +134,9 @@ void PickTool::meshPick(int x, int y) {
     RenderScript([&](QTime& t){
         pickScript();
         if(visible_picks.size())
-            global::con<InteractiveCtrl>().focus(global::con<InteractiveCtrl>().interactiveObject(visible_picks[0][0]));
+            global::con<GLMeshCtrl>().focus(global::con<GLMeshCtrl>().interactiveObject(visible_picks[0][0]));
         else
-            global::con<InteractiveCtrl>().focus(nullptr);
+            global::con<GLMeshCtrl>().focus(nullptr);
         clearPicks();
     });
 }

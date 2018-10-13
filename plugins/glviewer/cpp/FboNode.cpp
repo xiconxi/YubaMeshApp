@@ -3,7 +3,7 @@
 #include "controller/ViewController.h"
 #include "controller/ShaderController.h"
 #include "controller/CentralController.h"
-#include "controller/InteractiveController.h"
+#include "controller/GLMeshController.h"
 
 #include "utils/Pick.h"
 #include "utils/Select.h"
@@ -11,7 +11,7 @@
 #include "utils/auxiliary.h"
 //#include "utils/ScriptSamples.h"
 
-#include "bases/InteractiveObjectMesh.h"
+#include "bases/GLMeshObject.h"
 
 #include <QSGTextureProvider>
 #include <easylogging++.h>
@@ -44,23 +44,31 @@ QQuickFramebufferObject::Renderer* FboNode::createRenderer() const {
        {"core"  ,GLSLFileConfig{V(prefix+"default"),F(prefix+"default")},nullptr},
        {"axes",GLSLFileConfig{V(prefix+"tex_axes"),F(prefix+"tex_axes")},nullptr},
        {"selection",GLSLFileConfig{V(prefix+"default"),F(prefix+"selection")},nullptr},
+       {"adjacency", GLSLFileConfig{V(prefix+"adjacency_tex"),G(prefix+"adjacency_tex"),F(prefix+"adjacency_tex") },nullptr},
        {"select",GLSLFileConfig{V(prefix+"select_mask"),G(prefix+"select_mask")},[](GLuint id){
             const char* select_varing[] = {"face"};
             gl.glTransformFeedbackVaryings(id, 1, select_varing ,GL_INTERLEAVED_ATTRIBS);
+        }},
+        {"select_adjacency",GLSLFileConfig{V(prefix+"select_mask"),G(prefix+"select_mask_adjacency")},[](GLuint id){
+            const char* select_varing[] = {"face"};
+            gl.glTransformFeedbackVaryings(id, 1, select_varing ,GL_INTERLEAVED_ATTRIBS);
         }}
+
     });
 
     global::con<ViewCtrl>().addView("cam",new ViewerMatrix());
 
     // meshCtrl Callback! must initialize
-    global::con<InteractiveCtrl>().selectTool = new("selectTool") SelectTool();
-    global::con<InteractiveCtrl>().selectTool->createBufferScript();
+    global::con<GLMeshCtrl>().selectTool = new("selectTool") SelectTool();
+    global::con<GLMeshCtrl>().selectTool->createBufferScript();
 
-    global::con<InteractiveCtrl>().pickTool = new("pickTool") PickTool();
-    global::con<InteractiveCtrl>().pickTool->createBufferScript();
+    global::con<GLMeshCtrl>().pickTool = new("pickTool") PickTool();
+    global::con<GLMeshCtrl>().pickTool->createBufferScript();
 
     YbCore::aux::addCoord3d(1.0f,0.01f,"axes");
     YbCore::aux::addBox3d(10.0f,0.1f,"box");
+    YbCore::aux::addInteractiveFaceTexDemo("/Users/hotpot/data/007/007.obj", "demo");
+//    YbCore::aux::addInteractiveDemo("/Users/hotpot/data/007/007.obj", "demo");
 
     return ret;
 }
@@ -87,22 +95,22 @@ void FboNode::scaleBy(float s) {
 }
 
 void FboNode::singleFacePick(int x, int y) {
-    global::con<InteractiveCtrl>().pickTool->meshPick(x,y);
+    global::con<GLMeshCtrl>().pickTool->meshPick(x,y);
     global::con<RenderCtrl>().update();
 }
 
 void FboNode::screenAreaPick(QQuickPaintedItem *item) {
-    global::con<InteractiveCtrl>().selectTool->areasFaceSelect(item);
+    global::con<GLMeshCtrl>().selectTool->areasFaceSelect(item);
     global::con<RenderCtrl>().update();
     ((SelectCanvas*)item)->clear();
 }
 
 void FboNode::axesVisible(bool status) {
-    global::con<InteractiveCtrl>().object("axes")->visible = status;
+    global::con<GLMeshCtrl>().object("axes")->visible = status;
     global::con<RenderCtrl>().update();
 }
 
 void FboNode::boxVisible(bool status) {
-    global::con<InteractiveCtrl>().object("box")->visible = status;
+    global::con<GLMeshCtrl>().object("box")->visible = status;
     global::con<RenderCtrl>().update();
 }

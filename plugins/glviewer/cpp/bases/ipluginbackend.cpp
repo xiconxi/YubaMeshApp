@@ -1,9 +1,10 @@
 #include "./IPluginBackend.h"
-#include "./InteractiveObjectMesh.h"
+#include "./GLMeshObject.h"
 #include "../controller/RenderController.h"
 #include "../controller/ShaderController.h"
-#include "../controller/InteractiveController.h"
+#include "../controller/GLMeshController.h"
 #include <YbMesh/YbMesh.hpp>
+#include "../render/InteractiveObject.h"
 
 bool IPluginBackend::importMesh(QString url){
     auto str = url.toStdString().substr(7);
@@ -20,13 +21,13 @@ bool IPluginBackend::importMesh(std::string url, std::string name) {
         object->syncFacesBuffersDataScript();
         object->syncSelectBufferScript();
     });
-    global::con<InteractiveCtrl>().addInteractiveObject(name, object);
+    global::con<GLMeshCtrl>().addInteractiveObject(name, object);
     return true;
 }
 
 void IPluginBackend::construction(){
    ICtrl<ShaderCtrl>::ReleasePluginInstance();
-   ICtrl<InteractiveCtrl>::ReleasePluginInstance();
+   ICtrl<GLMeshCtrl>::ReleasePluginInstance();
 }
 
 void IPluginBackend::destruction(){

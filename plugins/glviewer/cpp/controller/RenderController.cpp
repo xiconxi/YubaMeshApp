@@ -1,6 +1,6 @@
 #include "RenderController.h"
 #include "ViewController.h"
-#include "InteractiveController.h"
+#include "GLMeshController.h"
 #include <QOpenGLFramebufferObjectFormat>
 #include <QTime>
 #include <QThread>
@@ -39,7 +39,7 @@ QOpenGLFramebufferObject* RenderCtrl::createFramebufferObject(const QSize &size)
     frame_buffer = new QOpenGLFramebufferObject(size, format);
 
     global::con<ViewCtrl>().updateSize(size.width(), size.height());
-    global::con<InteractiveCtrl>().pickTool->sizingScreenBufferScript();
+    global::con<GLMeshCtrl>().pickTool->sizingScreenBufferScript();
     return  frame_buffer;
 }
 

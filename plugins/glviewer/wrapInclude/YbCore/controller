@@ -4,7 +4,7 @@
 #include "../cpp/controller/RenderController.h"
 #include "../cpp/controller/ShaderController.h"
 #include "../cpp/controller/ViewController.h"
-#include "../cpp/controller/InteractiveController.h"
+#include "../cpp/controller/GLMeshController.h"
 
 #  define LIBSHARED_EXPORT Q_DECL_IMPORT
 // needed by windows ?
@@ -14,6 +14,8 @@
 //extern template ViewCtrl  & con();
 
 #include "../cpp/bases/IPluginBackend.h"
-#include "../cpp/bases/InteractiveObjectMesh.h"
+#include "../cpp/bases/GLMeshObject.h"
+#include "../cpp/render/InteractiveFaceTexObject.h"
+#include "../cpp/render/InteractiveObject.h"
 
 #endif // CONTROLLER_H

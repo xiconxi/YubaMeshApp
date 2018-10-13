@@ -10,7 +10,9 @@
 #include <glm/vec3.hpp>
 #include <QReadWriteLock>
 
+class QOpenGLShaderProgram;
 class InteractiveObject;
+class InteractiveFaceTexObject;
 
 class LIBSHARED_EXPORT SelectTool: public RenderScript {
 public:
@@ -28,8 +30,6 @@ public:
 
 private:
 
-    void SelectScript(QTime& t);
-
     void drawResultSrcipt(QTime& t);
 
     std::vector<glm::ivec3> downloadSelectionsScript(InteractiveObject* object);
@@ -46,6 +46,9 @@ private:
     std::array<int,2>  stream_size = {0,0};
 
     QReadWriteLock select_lock;
+
+    friend class InteractiveObject;
+    friend class InteractiveFaceTexObject;
 };
 
 #endif // SELECTMANAGER_H

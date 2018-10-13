@@ -16,7 +16,8 @@ SOURCES += \
     PluginBackend.cpp \
     render/ComponentsRender.cpp \
     render/WhirlwindRender.cpp \
-    render/GridTextureRender.cpp
+    render/GridTextureRender.cpp \
+    render/PerFaceTexRender.cpp
 
 HEADERS += \
     develop_plugin.h \
@@ -24,7 +25,8 @@ HEADERS += \
     PluginBackend.h \
     render/ComponentsRender.h \
     render/WhirlwindRender.h \
-    render/GridTextureRender.h
+    render/GridTextureRender.h \
+    render/PerFaceTexRender.h
 
 CONFIG(release, debug|release): {
     DESTDIR = ../../modules/$$TARGET

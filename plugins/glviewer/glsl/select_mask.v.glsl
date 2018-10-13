@@ -1,9 +1,7 @@
 #version 410
 layout (location = 0) in vec3 vert;
-
 uniform mat4 model;
 uniform mat4 camera_vp;
-
 out int vert_id;
 void main()
 {

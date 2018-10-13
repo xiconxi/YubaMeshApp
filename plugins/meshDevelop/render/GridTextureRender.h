@@ -7,7 +7,7 @@
 #include <QOpenGLTexture>
 class PluginBackend;
 
-class GridTextureRender:public IDrawObject,public RenderScript
+class GridTextureRender:public IGLMeshObject,public RenderScript
 {
 public:
     GridTextureRender(TriMesh& mesh);

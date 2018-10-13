@@ -6,6 +6,7 @@
 class ComponentsRender;
 class WhirlwindRender;
 class GridTextureRender;
+class PerFaceTexRender;
 
 class PluginBackend : public IPluginBackend
 {
@@ -21,6 +22,7 @@ private:
     ComponentsRender* components_render;
     WhirlwindRender* whirlwind_render;
     GridTextureRender* gridtexture_render;
+    PerFaceTexRender* perfacetex_render;
 };
 
 #endif // PLUGINBACKEND_H

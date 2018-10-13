@@ -11,11 +11,11 @@ using indicesTriMesh = YbMesh::indicesTriMesh<T>;
 
 indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V0(std::string filename) {
     std::ifstream fileHandle(filename,std::ios_base::in);
-    indicesTriMesh<glm::vec3> vmesh(std::make_shared<std::vector<glm::vec3>>(),
-                                    std::make_shared<std::vector<glm::ivec3>>());
+    auto meshv = std::make_shared<std::vector<glm::vec3>>();
+    auto meshf = std::make_shared<std::vector<glm::ivec3>>();
     if(!fileHandle.is_open() ) {
         LOG(INFO) << "failed to load obj: " << filename;
-        return vmesh;
+        return indicesTriMesh<glm::vec3>(meshv,meshf);
     }
     char tmpLine[500];
     enum F_MODE{V, VT, VTN} f_mode;
@@ -24,12 +24,12 @@ indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V0(std::string 
         if ( tmpLine[0] == '#' ) continue;
         char *start;
         if((start=strstr(tmpLine,"v "))){
-            vmesh.v().resize(vmesh.v().size()+1);
-            auto& xyz = *(std::prev(vmesh.v().end()));
+            meshv->resize(meshv->size()+1);
+            auto& xyz = *(std::prev(meshv->end()));
             sscanf(start,"v %f%f%f",&xyz[0],&xyz[1],&xyz[2]);
         }else if((start=strstr(tmpLine,"f "))){
-            vmesh.f().resize(vmesh.f().size()+1);
-            auto& f = *(std::prev(vmesh.f().end()));
+            meshf->resize(meshf->size()+1);
+            auto& f = *(std::prev(meshf->end()));
             switch (f_mode) {
             case VTN:
                 sscanf(start,"f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d",&f[0],&f[1],&f[2]);
@@ -52,9 +52,9 @@ indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V0(std::string 
             f -= 1;
         }
     }
-    LOG(INFO) << filename << ' ' << vmesh.v().size() << ' ' << vmesh.f().size();
+    LOG(INFO) << filename << ' ' << meshv->size() << ' ' << meshf->size();
     fileHandle.close();
-    return vmesh;
+    return indicesTriMesh<glm::vec3>(meshv,meshf);
 }
 
 std::pair<indicesTriMesh<glm::vec2>,indicesTriMesh<glm::vec3>> LIBSHARED_EXPORT YbMesh::IO::importOBJ_V1(std::string filename) {

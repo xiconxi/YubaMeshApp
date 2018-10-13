@@ -6,7 +6,7 @@
 
 class PluginBackend;
 
-class WhirlwindRender:public IDrawObject,public RenderScript
+class WhirlwindRender:public IGLMeshObject,public RenderScript
 {
 public:
     WhirlwindRender(TriMesh&& mesh);
@@ -19,5 +19,6 @@ private:
 
 // algorithm
 void invincibleWhirlwindTriangle(YbMesh::indicesTriMesh<glm::vec3>& mesh);
+void invincibleWhirlwindTriangleWithMainDirection(YbMesh::indicesTriMesh<glm::vec3>& mesh,glm::vec3 v);
 
 #endif // WHIRLWINDRENDER_H

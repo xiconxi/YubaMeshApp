@@ -1,9 +1,9 @@
-#include "InteractiveObjectMesh.h"
+#include "GLMeshObject.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <QOpenGLFunctions_4_0_Core>
 #include <easylogging++.h>
 #include "../controller/CentralController.h"
-#include "../controller/InteractiveController.h"
+#include "../controller/GLMeshController.h"
 #include "../utils/Select.h"
 #include <YbMesh/YbMesh.hpp>
 
@@ -23,23 +23,23 @@ void IModelTransform::scaleBy(float s) {
     model = glm::scale(glm::mat4(), (1+s)*glm::vec3(1,1,1)) * model;
 }
 
-IDrawObject::IDrawObject(TriMesh&& vmesh, int _components):m_v(vmesh),components(_components, _components == 1? m_v.f().size():0),
+IGLMeshObject::IGLMeshObject(TriMesh&& vmesh, int _components):m_v(vmesh),components(_components, _components == 1? m_v.f().size():0),
             m_n(YbMesh::indicesTriMesh<glm::vec3>(std::make_shared<std::vector<glm::vec3>>(),m_v.shared_f())){
 }
 
-void IDrawObject::createBufferScript() {
+void IGLMeshObject::createBufferScript() {
     gl.glGenVertexArrays(1, &vao);
     gl.glGenBuffers(1, &v_buffer);
     gl.glGenBuffers(1, &ibo);
 }
 
-void IDrawObject::syncFacesBuffersDataScript() {
+void IGLMeshObject::syncFacesBuffersDataScript() {
     auto& f = m_v.f();
     gl.glBindBuffer(GL_ARRAY_BUFFER, ibo);
     gl.glBufferData(GL_ARRAY_BUFFER, f.size()*sizeof(f[0]), f.data(), GL_STATIC_DRAW);
 }
 
-void IDrawObject::syncVertexBuffersDataScript() {
+void IGLMeshObject::syncVertexBuffersDataScript() {
     auto& f = m_v.f();
     auto& v = m_v.v();
     auto& vn = m_n.v();
@@ -57,76 +57,45 @@ void IDrawObject::syncVertexBuffersDataScript() {
     gl.glBindVertexArray(0);
 }
 
-void IDrawObject::drawElementScript(uint start, uint size) {
+void IGLMeshObject::drawElementScript(uint start, uint size) {
     drawElementBufferScript(ibo,start,size);
 }
 
-IDrawObject::_::_(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0) {
+IGLMeshObject::_::_(int s,int ss):intervals(s,glm::ivec2(0,ss)), counts(s,ss), offset(s,(const void*)0) {
     update();
 }
 
-void IDrawObject::_::update() {
+void IGLMeshObject::_::update() {
     for(int i = 0; i < intervals.size(); i++) {
         counts[i] = (intervals[i][1] > 0?(intervals[i][1] - intervals[i][0]):0)*3;
         offset[i] = (const void*)(intervals[i][0]*sizeof(glm::vec3));
     }
 }
 
-void IDrawObject::multiDrawElementScript() {
+void IGLMeshObject::multiDrawElementScript() {
     gl.glBindVertexArray(vao);
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     gl.glMultiDrawElements(GL_TRIANGLES, components.counts.data(), GL_UNSIGNED_INT, components.offset.data(), components.counts.size());
     gl.glBindVertexArray(0);
 }
 
-void IDrawObject::drawElementBufferScript(uint buffer_id, uint start, uint size) {
+void IGLMeshObject::drawElementBufferScript(uint buffer_id, uint start, uint size) {
     gl.glBindVertexArray(vao);
     gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id);
     gl.glDrawElements(GL_TRIANGLES, (size?size:m_v.f().size())*3, GL_UNSIGNED_INT, (GLvoid*)(start*3*sizeof(unsigned int)));
     gl.glBindVertexArray(0);
 }
 
-void IDrawObject::calculateNorm() {
+void IGLMeshObject::calculateNorm() {
     YbMesh::visualization::calculateNorm(m_v, m_n);
 }
 
-void IDrawObject::normalize(bool centralized) {
+void IGLMeshObject::normalize(bool centralized) {
     model = YbMesh::visualization::normalize(m_v,centralized);
 }
 
-IDrawObject::~IDrawObject(){
+IGLMeshObject::~IGLMeshObject(){
     gl.glDeleteVertexArrays(1, &vao);
     gl.glDeleteBuffers(1, &v_buffer);
     gl.glDeleteBuffers(1, &ibo);
-}
-
-InteractiveObject::~InteractiveObject() {
-    gl.glDeleteBuffers(1, &selected_buffer);
-}
-
-InteractiveObject::InteractiveObject(TriMesh&& vmesh, int components):QObject(nullptr),IDrawObject(std::move(vmesh), components){
-
-}
-
-void InteractiveObject::createBufferScript() {
-    IDrawObject::createBufferScript();
-    gl.glGenBuffers(1, &selected_buffer);
-}
-
-void InteractiveObject::syncSelectBufferScript() {
-    global::con<InteractiveCtrl>().selectTool->syncBufferScript(this);
-}
-
-void InteractiveObject::downloadSelectedBufferScript(int buffer_size) {
-    selected_faces.resize(buffer_size);
-    gl.glBindBuffer(GL_COPY_READ_BUFFER, selected_buffer);
-    const void *data = gl.glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
-    if (data)
-        memcpy(selected_faces.data(), data, selected_faces.size() * sizeof(selected_faces[0]));
-    gl.glUnmapBuffer(GL_COPY_READ_BUFFER);
-    gl.glBindBuffer(GL_COPY_READ_BUFFER, 0);
-}
-
-const std::vector<glm::ivec3>& InteractiveObject::selectedFaces() {
-    return selected_faces;
 }

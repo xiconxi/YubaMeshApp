@@ -9,20 +9,20 @@
 class PickTool;
 class SelectTool;
 class InteractiveObject;
-class IDrawObject;
+class IGLMeshObject;
 
-class LIBSHARED_EXPORT InteractiveCtrl
+class LIBSHARED_EXPORT GLMeshCtrl
 {
 public:
-    InteractiveCtrl();
-    ~InteractiveCtrl();
+    GLMeshCtrl();
+    ~GLMeshCtrl();
     SelectTool mutable *selectTool;
     PickTool mutable *pickTool;
 
-    void addInteractiveObject(std::string name,IDrawObject* object);
-    void delInteractiveObject(IDrawObject* object);
-    IDrawObject* object(std::string name);
-    IDrawObject* object(uint id);
+    void addInteractiveObject(std::string name,IGLMeshObject* object);
+    void delInteractiveObject(IGLMeshObject* object);
+    IGLMeshObject* object(std::string name);
+    IGLMeshObject* object(uint id);
 
     InteractiveObject* interactiveObject(std::string name);
     InteractiveObject* interactiveObject(uint id);
@@ -30,14 +30,14 @@ public:
     void focus(InteractiveObject* object);
     void focus(uint id);
     InteractiveObject* focus();
-    std::map<uint,IDrawObject*>& allObjects();
+    std::map<uint,IGLMeshObject*>& allObjects();
 
 private:
     uint queryInteractiveId();
-    friend class ICtrl<InteractiveCtrl>;
+    friend class ICtrl<GLMeshCtrl>;
     uint interactive_cnts = 0;
     std::map<std::string,uint> name2id;
-    std::map<uint,IDrawObject* > objects;
+    std::map<uint,IGLMeshObject* > objects;
     InteractiveObject* focus_object = nullptr;
 };
 

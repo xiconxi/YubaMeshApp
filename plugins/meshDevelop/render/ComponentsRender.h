@@ -7,7 +7,7 @@
 
 class PluginBackend;
 
-class ComponentsRender:public RenderScript,public IDrawObject
+class ComponentsRender:public RenderScript,public IGLMeshObject
 {
 public:
     ComponentsRender(TriMesh&& vmesh,int components);

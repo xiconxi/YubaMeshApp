@@ -5,7 +5,7 @@
 #include "PluginBackend.h"
 
 ComponentsRender::ComponentsRender(TriMesh&& vmesh,int components):
-    IDrawObject(std::move(vmesh),components),
+    IGLMeshObject(std::move(vmesh),components),
     vertex_cluster(vmesh.v().size(),0),
     RenderScript(std::bind(&ComponentsRender::draw, this, std::placeholders::_1))
 {
@@ -78,7 +78,7 @@ void ComponentsRender::componetAnalysic(){
         offset = intervals[i][1];
     }
     this->components.update();
-    auto box = global::con<InteractiveCtrl>().object("box");
+    auto box = global::con<GLMeshCtrl>().object("box");
     box->normalize();
     box->model = this->model*YbMesh::visualization::boundingBox(triMesh,pca)*box->model;
 

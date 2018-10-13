@@ -3,7 +3,7 @@
 #include "ViewController.h"
 #include "ShaderController.h"
 #include "RenderController.h"
-#include "InteractiveController.h"
+#include "GLMeshController.h"
 
 ActiveGL gl;
 

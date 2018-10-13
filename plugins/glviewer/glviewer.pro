@@ -16,7 +16,6 @@ SOURCES += \
     cpp/FboNode.cpp \
     cpp/glviewer_plugin.cpp \
     cpp/controller/CentralController.cpp \
-    cpp/controller/InteractiveController.cpp \
 #    cpp/controller/MeshController.cpp \
     cpp/controller/RenderController.cpp \
     cpp/controller/ShaderController.cpp \
@@ -27,8 +26,11 @@ SOURCES += \
     cpp/utils/ScriptSamples.cpp \
     cpp/bases/IPluginBackend.cpp \
     cpp/bases/IRenderScript.cpp \
-    cpp/bases/InteractiveObjectMesh.cpp \
     cpp/utils/auxiliary.cpp \
+    cpp/bases/GLMeshObject.cpp \
+    cpp/controller/GLMeshController.cpp \
+    ../glviewer/cpp/render/InteractiveObject.cpp \
+    cpp/render/InteractiveFaceTexObject.cpp
 
 
 
@@ -40,7 +42,6 @@ HEADERS += \
     cpp/bases/IPluginBackend.h \
     cpp/bases/ISingleton.inc \
     cpp/controller/CentralController.h \
-    cpp/controller/InteractiveController.h \
     cpp/controller/RenderController.h \
     cpp/controller/ShaderController.h \
     cpp/controller/ViewController.h \
@@ -52,8 +53,11 @@ HEADERS += \
     wrapInclude/YbCore/controller \
     wrapInclude/YbCore/coretool \
     wrapInclude/YbCore/scripts \
-    cpp/bases/InteractiveObjectMesh.h \
-    cpp/utils/auxiliary.h
+    cpp/utils/auxiliary.h \
+    cpp/bases/GLMeshObject.h \
+    cpp/controller/GLMeshController.h \
+    ../glviewer/cpp/render/InteractiveObject.h \
+    cpp/render/InteractiveFaceTexObject.h
 
 
 
@@ -78,3 +82,6 @@ LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
 osx{
     QMAKE_POST_LINK += install_name_tool -id @rpath/libGLViewer.dylib ../../modules/$$TARGET/libGLViewer.dylib
 }
+
+DISTFILES += \
+    glsl/select__mask_adjacency.g.glsl

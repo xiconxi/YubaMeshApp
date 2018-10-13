@@ -2,8 +2,9 @@
 #include <QTime>
 #include <stack>
 #include <YbCore/scripts>
+#include <queue>
 
-WhirlwindRender::WhirlwindRender(TriMesh&& vmesh): IDrawObject(std::move(vmesh)),
+WhirlwindRender::WhirlwindRender(TriMesh&& vmesh): IGLMeshObject(std::move(vmesh)),
     RenderScript(std::bind(&WhirlwindRender::draw, this, std::placeholders::_1))
 {
     this->normalize();
@@ -40,13 +41,13 @@ void invincibleWhirlwindTriangle(YbMesh::indicesTriMesh<glm::vec3>& mesh) {
     std::vector<bool> face_visited_flag(mesh.f().size(),false);
     std::vector<glm::ivec3> new_f;
     new_f.reserve(mesh.f().size());
+    std::stack<int> border_edges;
 
     for(int last_face = 0; last_face < mesh.f().size(); last_face++) {
         if(face_visited_flag[last_face]) continue;
         new_f.emplace_back(mesh.f()[last_face]);
         face_visited_flag[last_face] = true;
         YbMesh::IHalfEdgeIt last_edge = half.edge(last_face*3);
-        std::stack<int> border_edges;
         while(1) {
             if(face_visited_flag[last_edge->pair()->face()]) {
                 if(face_visited_flag[last_edge->next()->pair()->face()]){
@@ -74,4 +75,45 @@ void invincibleWhirlwindTriangle(YbMesh::indicesTriMesh<glm::vec3>& mesh) {
     }
     std::swap(mesh.f(),new_f);
 }
+
+void invincibleWhirlwindTriangleWithMainDirection(YbMesh::indicesTriMesh<glm::vec3>& mesh,glm::vec3 v) {
+    auto half = YbMesh::SharedHalfEdge(mesh);
+    std::vector<bool> face_visited_flag(mesh.f().size(),false);
+    std::vector<glm::ivec3> new_f;
+    new_f.reserve(mesh.f().size());
+    std::priority_queue<std::pair<float, int>> border_edges;
+
+    for(int last_face = 0; last_face < mesh.f().size(); last_face++) {
+        if(face_visited_flag[last_face]) continue;
+        new_f.emplace_back(mesh.f()[last_face]);
+        face_visited_flag[last_face] = true;
+        YbMesh::IHalfEdgeIt last_edge = half.edge(last_face*3);
+        while(1) {
+            if(face_visited_flag[last_edge->pair()->face()]) {
+                if(face_visited_flag[last_edge->next()->pair()->face()]){
+                    while(border_edges.empty() == false){
+                        auto e = half.edge(border_edges.top().second);
+                        border_edges.pop();
+                        if(face_visited_flag[e->pair()->face()] == false){
+                            last_edge = e;
+                            LOG(INFO) << "fake";
+                            break;
+                        }
+                    }
+                    if(border_edges.empty())
+                    break;
+                }else
+                    last_edge = last_edge->next();
+            }
+            last_edge = last_edge->pair();
+            new_f.emplace_back(mesh.f()[last_edge->face()]);
+            face_visited_flag[last_edge->face()] = true;
+            last_edge = last_edge->next();
+
+            border_edges.push(std::make_pair(glm::dot(v,last_edge->to()->v),last_edge->_next));
+        }
+    }
+    std::swap(mesh.f(),new_f);
+}
+
 

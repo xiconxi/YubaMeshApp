@@ -27,6 +27,8 @@ namespace YbMesh {
     template <class T>
     struct indicesTriMesh
     {
+        indicesTriMesh(const indicesTriMesh<T>& m):vp(m.vp),fp(m.fp){}
+        indicesTriMesh(const indicesTriMesh<T>&& m):vp(m.vp),fp(m.fp){}
         indicesTriMesh(std::shared_ptr<vector<T>> _vp, std::shared_ptr<vector<glm::ivec3>> _fp)
             :vp(_vp),fp(_fp){}
 
