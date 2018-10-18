@@ -13,15 +13,7 @@ class PerFaceTexRender:public InteractiveFaceTexObject,public RenderScript
 public:
     PerFaceTexRender(TriMesh& mesh, YbMesh::indicesTriMesh<glm::vec2>& texMesh);
 
-    // GL functions
-//    void syncVertexBuffersDataScript() override;
-//    void syncFacesBuffersDataScript() override;
-
-//    void drawElementBufferScript(uint buffer_id, uint start=0, uint size=0) override;
-
     void draw(QTime& t);
-private:
-//    YbMesh::indicesTriMesh<glm::vec2> texM;
 };
 
 #endif // PERFACETEXRENDER_H
