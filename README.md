@@ -28,7 +28,7 @@ hints:
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/20180623-191330.png)
 
-wireframe
+[wireframe](https://github.com/xiconxi/YubaMesh/blob/master/wireframe.md)
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/20180603-223426.png)
 
