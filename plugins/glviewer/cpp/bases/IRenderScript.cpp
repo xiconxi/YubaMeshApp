@@ -31,7 +31,7 @@ void* RenderScript::operator new(size_t size, std::string render_name){
 
 #ifdef GL_ERROR_HOOK
 void RenderScript::render(QTime &t) {
-    m_render(t);
+    if(!is_paused) m_render(t);
     auto er = gl.glGetError();
     if(er)
         LOG(INFO) << "catch Error: " << this << ' ' << er;

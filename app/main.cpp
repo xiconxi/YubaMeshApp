@@ -5,6 +5,7 @@
 #include "gl4window.h"
 #include <QProcess>
 #include <QDir>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {    
@@ -28,6 +29,9 @@ int main(int argc, char *argv[])
     auto root = engine.rootContext();
     root->setContextProperty("GMouse", engine.rootObjects().first()->findChild<QObject *>("GLMouseAreaObject"));
     root->setContextProperty("devicePixelRatio", app.devicePixelRatio());
+    if(argc == 2){
+        engine.rootObjects().first()->findChild<QObject *>("Glviewer")->setProperty("launchUrl", argv[1]);
+    }
     if (engine.rootObjects().isEmpty())
         return -1;
 

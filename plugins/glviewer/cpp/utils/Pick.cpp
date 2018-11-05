@@ -32,14 +32,12 @@ void PickTool::pickScript() {
 
     for(auto objectKV:global::con<GLMeshCtrl>().allObjects()){
         auto mesh = objectKV.second;
-        if(mesh->visible == false) continue;
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();
     }
     for(auto objectKV:plugin::con<GLMeshCtrl>().allObjects()){
         auto mesh = objectKV.second;
-        if(mesh->visible == false) continue;
         shader->setUniformValue("model", global::con<ViewCtrl>().view()->Model()*mesh->Model());
         shader->setUniformValue("mesh_id",(float)objectKV.first);
         mesh->drawElementScript();

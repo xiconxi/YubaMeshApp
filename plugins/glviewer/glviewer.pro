@@ -84,4 +84,5 @@ osx{
 }
 
 DISTFILES += \
-    glsl/select__mask_adjacency.g.glsl
+    glsl/select__mask_adjacency.g.glsl \
+    glsl/default.g.glsl

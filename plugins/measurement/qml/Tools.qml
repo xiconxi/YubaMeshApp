@@ -1,7 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import Measurement 1.0
-Item {
+Rectangle {
+    color: '#909294'
     Column{
         anchors.horizontalCenter: parent.horizontalCenter
         y: 100
@@ -108,5 +109,9 @@ Item {
             }
             onSliceChanged:  slice.update()
         }
+    }
+
+    Component.onCompleted: {
+        SubBackends.construction()
     }
 }

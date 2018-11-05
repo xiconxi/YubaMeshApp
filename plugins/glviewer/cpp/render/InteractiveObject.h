@@ -18,7 +18,9 @@ public:
     void selectionVisualizedScript(QTime& t);
     ~InteractiveObject();
 
+
     const std::vector<glm::ivec3>& selectedFaces();
+
 signals:
     void FaceSelected(InteractiveObject* object);
 protected:
@@ -26,7 +28,7 @@ protected:
     friend class SelectTool;
     uint selected_buffer = 0;
     std::vector<glm::ivec3> selected_faces;
-    std::string select_shader_name = "select";
+    std::string select_shader_name = "select";    
 };
 
 

@@ -20,6 +20,9 @@ class LIBSHARED_EXPORT RenderCtrl: public QQuickFramebufferObject::Renderer{
 
 public:
 
+    void pause(std::string name);
+    void resume(std::string name);
+
     void update(bool for_next_frame=false);
 
     void releaseScript(std::string name);

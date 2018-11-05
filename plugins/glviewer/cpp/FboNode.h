@@ -17,6 +17,7 @@ public:
 
 signals:
     void fpsChanged();
+    void launchUrlChanged();
 
 public slots:
     void move(int x, int y);
@@ -28,8 +29,11 @@ public slots:
 
     void axesVisible(bool status);
     void boxVisible(bool status);
+
+    void importMesh(QString url);
 private:
     qreal mutable m_fps = 60;
+    bool mutable is_ready = false;
 };
 
 #define FNode FboNode

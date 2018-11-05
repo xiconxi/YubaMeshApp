@@ -36,8 +36,6 @@ public:
     void calculateNorm();
     void normalize(bool centralized = true);
 
-    bool visible = true;
-
     YbMesh::indicesTriMesh<glm::vec3> m_v;
     YbMesh::indicesTriMesh<glm::vec3> m_n;
 

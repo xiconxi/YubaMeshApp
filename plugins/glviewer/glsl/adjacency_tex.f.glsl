@@ -18,7 +18,7 @@ vec3 real_texture() {
 
 void main()
 {
-    color.xyz = grid_texture(5184,6912,80)+vec3(gl_FrontFacing ? 0.5:0.1)*(0.2f+abs(dot(vec3(0,-1,0),wnorm)));
-//    color.xyz = real_texture()+vec3(gl_FrontFacing ? 0.5:0.1)*(0.2f+abs(dot(vec3(0,-1,0),wnorm)));
+//    color.xyz = grid_texture(5184,6912,80)+vec3(gl_FrontFacing ? 0.5:0.1)*(0.2f+abs(dot(vec3(0,-1,0),wnorm)));
+    color.xyz = real_texture()+vec3(gl_FrontFacing ? 0.5:0.1)*(0.2f+abs(dot(vec3(0,-1,0),wnorm)));
     color.w = 1.0;
 }

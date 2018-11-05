@@ -21,7 +21,6 @@ ComponentsRender::ComponentsRender(TriMesh&& vmesh,int components):
 }
 
 void ComponentsRender::draw(QTime &t) {
-    if(this->visible == false) return;
     auto shader = plugin::con<ShaderCtrl>().shader("base");
     auto view = global::con<ViewCtrl>().view();
     shader->bind();

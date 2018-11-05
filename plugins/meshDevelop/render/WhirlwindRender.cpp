@@ -19,7 +19,6 @@ WhirlwindRender::WhirlwindRender(TriMesh&& vmesh): IGLMeshObject(std::move(vmesh
 
 void WhirlwindRender::draw(QTime &t) {
     static int s = 0;
-    if(this->visible == false) return;
     auto shader = global::con<ShaderCtrl>().shader("core");
     auto view = global::con<ViewCtrl>().view();
     shader->bind();
@@ -66,7 +65,8 @@ void invincibleWhirlwindTriangle(YbMesh::indicesTriMesh<glm::vec3>& mesh) {
                     last_edge = last_edge->next();
             }
             last_edge = last_edge->pair();
-            new_f.emplace_back(mesh.f()[last_edge->face()]);
+//            new_f.emplace_back(mesh.f()[last_edge->face()]);
+            new_f.emplace_back(glm::ivec3{last_edge->_from, last_edge->_to, last_edge->next()->_to});
             face_visited_flag[last_edge->face()] = true;
             last_edge = last_edge->next();
 
@@ -96,7 +96,7 @@ void invincibleWhirlwindTriangleWithMainDirection(YbMesh::indicesTriMesh<glm::ve
                         border_edges.pop();
                         if(face_visited_flag[e->pair()->face()] == false){
                             last_edge = e;
-                            LOG(INFO) << "fake";
+//                            LOG(INFO) << "fake";
                             break;
                         }
                     }

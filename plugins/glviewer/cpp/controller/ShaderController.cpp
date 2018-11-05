@@ -46,6 +46,8 @@ bool ShaderCtrl::addShaderProgram(std::initializer_list<ShaderProgramConfig> lis
         if(programConfig.initial_f) programConfig.initial_f(shader->programId());
         shader->link();
         if(shader->isLinked() == false){
+            for(auto e: programConfig.config)
+                qDebug() << e.second ;
             qDebug() << shader->log();
             return false;
         }

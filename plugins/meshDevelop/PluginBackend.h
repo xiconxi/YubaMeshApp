@@ -14,8 +14,11 @@ class PluginBackend : public IPluginBackend
 public:
     PluginBackend();
     Q_INVOKABLE void construction() override;
+
+
     Q_INVOKABLE void checkComponents(int id, bool status);
-    Q_INVOKABLE void draw_for(QString value);
+
+//    Q_INVOKABLE void initialComponentsRender();
 
     bool importMesh(std::string url,std::string name) override;
 private:

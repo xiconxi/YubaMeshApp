@@ -11,7 +11,7 @@ class PluginBackend;
 class PerFaceTexRender:public InteractiveFaceTexObject,public RenderScript
 {
 public:
-    PerFaceTexRender(TriMesh& mesh, YbMesh::indicesTriMesh<glm::vec2>& texMesh);
+    PerFaceTexRender(TriMesh& mesh, YbMesh::indicesTriMesh<glm::vec2>& texMesh,std::string tex);
 
     void draw(QTime& t);
 };

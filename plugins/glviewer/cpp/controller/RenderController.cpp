@@ -87,3 +87,17 @@ void RenderCtrl::update(bool for_next_frame){
     this->render_volatile = true;
     this->for_next_frame = for_next_frame;
 }
+
+void RenderCtrl::pause(std::string name) {
+    named_lock.lockForWrite();
+    if(named_script.find(name) != named_script.end())
+        named_script[name]->is_paused = true;
+    named_lock.unlock();
+}
+
+void RenderCtrl::resume(std::string name) {
+    named_lock.lockForWrite();
+    if(named_script.find(name) != named_script.end())
+        named_script[name]->is_paused = false;
+    named_lock.unlock();
+}

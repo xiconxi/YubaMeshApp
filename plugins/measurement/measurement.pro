@@ -37,8 +37,9 @@ CONFIG(release, debug|release): {
     LIBS +=-L$$OUT_PWD/../../depends/FrameWorks/ -lYbMesh
 
     # Copy the qmldir file to the same folder as the plugin binary
+    cpqmldir.files += qml/*.qml
     cpqmldir.files += qml/qmldir
-    cpqmldir.files += qml/Tools.qml
+    cpqmldir.files += qml/*.xml
     cpqmldir.path = $$DESTDIR
 
     cpshaders.files += shaders/*.glsl

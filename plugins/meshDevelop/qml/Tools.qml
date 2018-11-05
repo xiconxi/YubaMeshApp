@@ -3,7 +3,8 @@ import QtQuick.Controls 1.4
 import MeshDevelop 1.0
 import QtQuick.Controls.Styles 1.4
 
-Item {
+Rectangle {
+    color: '#909294'
     Text{
         anchors.fill: parent
         y: 100

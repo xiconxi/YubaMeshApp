@@ -42,12 +42,12 @@ void SelectTool::areasFaceSelect(QQuickPaintedItem *areaItem) {
     RenderScript([this](QTime& t){
         for(auto objectKV:global::con<GLMeshCtrl>().allObjects()){
             auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
-            if(mesh == nullptr || mesh->visible == false) continue;
+            if(mesh == nullptr /*|| mesh->visible == false*/) continue;
             mesh->selectScript(t);
         }
         for(auto objectKV:plugin::con<GLMeshCtrl>().allObjects()){
             auto mesh = dynamic_cast<InteractiveObject*>(objectKV.second);
-            if(mesh == nullptr || mesh->visible == false) continue;
+            if(mesh == nullptr /*|| mesh->visible == false*/) continue;
             mesh->selectScript(t);
         }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<channel>
+    <tool>
+        <name>测量</name>
+        <source>Tools.qml</source>
+    </tool>
+    <tool>
+        <name>测试</name>
+        <source>Tool.test.qml</source>
+    </tool>
+</channel>

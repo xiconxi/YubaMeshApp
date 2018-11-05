@@ -6,6 +6,7 @@ namespace geometry {
 indicesTriMesh<glm::vec3> make_spherical(int scale);
 indicesTriMesh<glm::vec3> LIBSHARED_EXPORT make_axes(float h,float r);
 indicesTriMesh<glm::vec3> LIBSHARED_EXPORT make_box(float h,float r);
+indicesTriMesh<glm::vec3> LIBSHARED_EXPORT make_plane(float cols, float rows,float gap);
 }
 }
 #endif // GEOMETRY_H

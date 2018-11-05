@@ -17,6 +17,7 @@ public:
     virtual ~RenderScript(){}
     static void* operator new(size_t size, std::string render_name);
     void setRender(RenderFunc&& f);
+    bool is_paused = false;
 protected:
 #ifdef GL_ERROR_HOOK
     void render(QTime& t);

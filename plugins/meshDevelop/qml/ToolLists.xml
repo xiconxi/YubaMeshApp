@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<channel>
+    <tool>
+        <name>部件</name>
+        <source>Tools.qml</source>
+    </tool>
+    <tool>
+        <name>参数化</name>
+        <source>Tools.qml</source>
+    </tool>
+    <tool>
+        <name>面纹理</name>
+        <source>Tools.qml</source>
+    </tool>
+    <tool>
+        <name>网格排序</name>
+        <source>Tools.qml</source>
+    </tool>
+</channel>

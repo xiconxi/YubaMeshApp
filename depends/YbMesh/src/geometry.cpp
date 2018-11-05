@@ -125,3 +125,24 @@ YbMesh::indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::geometry::make_box(fl
 
     return YbMesh::indicesTriMesh<glm::vec3>(v,f);
 }
+
+
+YbMesh::indicesTriMesh<glm::vec3> LIBSHARED_EXPORT YbMesh::geometry::make_plane(float w, float h, float gap) {
+    auto v = std::make_shared<std::vector<glm::vec3>>();
+    auto f = std::make_shared<std::vector<glm::ivec3>>();
+    int cols = 0, rows;
+    for(float j = -h; j <= h; j+=gap) {
+        for(float i = -w; i <= w; i+=gap ) {
+            v->emplace_back(glm::vec3(i,j,0));
+        }
+        cols = cols > 0 ? cols:v->size();
+    }
+    rows = v->size()/cols;
+    for(int i = 1; i < rows; i++) {
+        for(int j = 1; j < cols; j++ ){
+            f->emplace_back(glm::ivec3( i*cols+j-1, (i-1)*cols+j-1,(i-1)*cols+j));
+            f->emplace_back(glm::ivec3((i-1)*cols+j, i*cols+j, i*cols+j-1));
+        }
+    }
+    return YbMesh::indicesTriMesh<glm::vec3>(v,f);
+}

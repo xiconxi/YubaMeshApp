@@ -21,13 +21,14 @@ void PluginBackend::construction() {
         plugin::con<ShaderCtrl>().addShaderProgram({{"adjacency_tex", GLSLFileConfig{ V(prefix+"adjacency_tex"),G(prefix+"adjacency_tex"),F(prefix+"adjacency_tex") },nullptr}});
 
     });
-    global::con<GLMeshCtrl>().object("axes")->visible = false;
-    global::con<GLMeshCtrl>().object("box")->visible = false;
+    global::con<RenderCtrl>().pause("axes");
+    global::con<RenderCtrl>().pause("box");
 
+    importMesh(MESHPATH"bunny.obj","bunny");
 
-//    importMesh(MESHPATH"bunny.obj","bunny");
 //    importMesh(MESHPATH"body2.obj","body2");
-    importMesh("/Users/hotpot/data/007/007.obj","perface");
+
+//    importMesh("/Users/hotpot/data/mesh_data/2.obj","2.obj");
 
 //    importMesh("/Users/hotpot/data/mesh_data/body2_head.obj","ptex");
 
@@ -40,34 +41,30 @@ void PluginBackend::construction() {
 //    });
 }
 
-void PluginBackend::draw_for(QString value) {
-
-}
-
 bool PluginBackend::importMesh(std::string url,std::string name){
     // 人体部件划分
 //    components_render = new("Components") ComponentsRender(YbMesh::IO::importOBJ_V0(url),8);
 //    plugin::con<InteractiveCtrl>().addInteractiveObject(name, components_render);
 
-//    auto mesh = YbMesh::IO::importOBJ_V0(url);
-//    invincibleWhirlwindTriangle(mesh);
-////    invincibleWhirlwindTriangleWithMainDirection(mesh, glm::vec3(0,0,1));
-//    whirlwind_render = new("Whirwind") WhirlwindRender(std::move(mesh));
-//    plugin::con<InteractiveCtrl>().addInteractiveObject(name, whirlwind_render);
+    auto mesh = YbMesh::IO::importOBJ_V0(url);
+    invincibleWhirlwindTriangle(mesh);
+//    invincibleWhirlwindTriangleWithMainDirection(mesh, glm::vec3(0,0,1));
+    whirlwind_render = new("Whirwind") WhirlwindRender(std::move(mesh));
+    plugin::con<GLMeshCtrl>().addInteractiveObject(name, whirlwind_render);
 
 //    auto mesh = YbMesh::IO::importOBJ_V0(url);
 //    gridtexture_render = new ("gridTex") GridTextureRender(mesh);
 //    plugin::con<InteractiveCtrl>().addInteractiveObject(name, gridtexture_render);
 
-    auto mesh = YbMesh::IO::importOBJ_V1(url);
-    perfacetex_render = new ("perfacetex") PerFaceTexRender(mesh.second, mesh.first);
-    plugin::con<GLMeshCtrl>().addInteractiveObject(name, perfacetex_render);
+//    auto mesh = YbMesh::IO::importOBJ_V1(url);
+//    perfacetex_render = new ("perfacetex") PerFaceTexRender(mesh.second, mesh.first,url.substr(0, url.find(".obj"))+"Image1.png");
+//    plugin::con<GLMeshCtrl>().addInteractiveObject(name, perfacetex_render);
 
     return true;
 }
 
 void PluginBackend::checkComponents(int id, bool status) {
-    if(components_render == nullptr || components_render->visible == false) return;
+//    if(components_render == nullptr || components_render->visible == false) return;
     components_render->components.intervals[id][1] = (status?1:-1)*abs(components_render->components.intervals[id][1]);
     components_render->components.update();
     global::con<RenderCtrl>().update();

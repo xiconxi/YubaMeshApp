@@ -1,17 +1,46 @@
-import QtQuick 2.0
+import QtQuick 2.11
 import GLViewer 1.0
 import "."
 Item {
+    id: _item
+    objectName: "Glviewer"
+    property string launchUrl
+    Shortcut{
+        sequence: "Ctrl+G"
+        onActivated: {
+            glViewer.grabToImage(function(image){
+                image.saveToFile(yubaDoc+Qt.formatDateTime(new Date(), "yyyyMMdd-hhmmss")+".png")
+            })
+        }
+    }
+    DropArea{
+        id: dropArea
+        anchors.fill: parent
+        onDropped: {
+            if(drop.hasUrls && drop.urls.length === 1) {
+                parent.launchUrl = drop.urls[0]
+            }else
+                drop.accept(true)
+        }
+    }
+
     GlViewer{
         id: glViewer
         anchors.fill: parent
-        Component.onCompleted:
+        Component.onCompleted:{
             wind.glViewer = glViewer
+        }
         Text{
             anchors.left: parent.left
             anchors.top: parent.top
             text: "FPS: " + glViewer.fps
             color: "red"
+        }
+        Connections{
+            target: _item
+            onLaunchUrlChanged: {
+                glViewer.importMesh(launchUrl)
+            }
         }
     }
 

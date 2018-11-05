@@ -179,7 +179,6 @@ GridTextureRender::GridTextureRender(TriMesh& mesh):IGLMeshObject(std::move(mesh
 }
 
 void GridTextureRender::draw(QTime &t) {
-    if(this->visible == false) return;
     auto shader = plugin::con<ShaderCtrl>().shader("grid_tex");
     auto view = global::con<ViewCtrl>().view();
     shader->bind();

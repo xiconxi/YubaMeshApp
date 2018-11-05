@@ -42,7 +42,8 @@ CONFIG(release, debug|release): {
 
     # Copy the qmldir file to the same folder as the plugin binary
     cpqmldir.files += qml/qmldir
-    cpqmldir.files += qml/Tools.qml
+    cpqmldir.files += qml/*.qml
+    cpqmldir.files += qml/*.xml
     cpqmldir.path = $$DESTDIR
 
     cpshaders.files += shaders/*.glsl
@@ -51,3 +52,6 @@ CONFIG(release, debug|release): {
     COPIES += cpqmldir \
         cpshaders
 }
+
+DISTFILES += \
+    qml/ToolX.qml

@@ -16,41 +16,21 @@ YubaWindow {
 
     Ybgl.Viewer{
         anchors.left: leftToolView.right
-        anchors.top: toolCategory.bottom
+        anchors.top: toolPanel.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        Shortcut{
-            sequence: "Ctrl+G"
-            onActivated: {
-                glViewer.grabToImage(function(image){
-                    image.saveToFile(yubaDoc+Qt.formatDateTime(new Date(), "yyyyMMdd-hhmmss")+".png")
-                })
-            }
-        }
 
-        DropArea{
-            id: dropArea
-            anchors.fill: parent
-            onDropped: {
-                if(drop.hasUrls && drop.urls.length === 1) {
-                    modelDroped(drop.urls[0])
-                }else
-                    drop.accept(true)
-            }
-            signal modelDroped(string fileUrl)
-        }
     }
 
     Rectangle{
         id:toolCategory
-        height: 20
+        height: 18
         color: '#615d5c'
         width: parent.width
         ListView{
             id:toolCategoryList
             anchors.fill: parent
             orientation: Qt.Horizontal
-            property int categoryId: 0
             boundsBehavior: Flickable.StopAtBounds
             spacing: 8
             model:XmlListModel {
@@ -69,26 +49,33 @@ YubaWindow {
                 }
             }
 
+            property string module
+            property string version
+
             onCurrentIndexChanged:{
-                if( leftToolView.subView){
-                    leftToolView.subView.destroy();
-                    leftToolView.subView = null;
-                }
-                var M = menuXmlModel.get(currentIndex)
-                var plugin_str ='import QtQuick 2.0; \nimport '+M.module + ' ' + M.version+'; \n'+
-                                'Tools{anchors.fill :parent\n
-                                Component.onCompleted: SubBackends.construction()\n' +
-                                "Connections{ target: dropArea; onModelDroped: SubBackends.importMesh(fileUrl) }
-                                }";
+                module = menuXmlModel.get(currentIndex).module
+                version = menuXmlModel.get(currentIndex).version
+                toolXmlModel.source = "file:///" + appPath + module + "/ToolLists.xml"
 
+//                if( leftToolView.subView){
+//                    leftToolView.subView.destroy();
+//                    leftToolView.subView = null;
+//                }
+//                var M = menuXmlModel.get(currentIndex)
+//                var plugin_str ='import QtQuick 2.0; \nimport '+M.module + ' ' + M.version+'; \n'+
+//                                'Tools{anchors.fill :parent\n
+//                                Component.onCompleted: SubBackends.construction()\n' +
+//                                "Connections{ target: dropArea; onModelDroped: SubBackends.importMesh(fileUrl) }
+//                                }";
+//                leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
 
-                leftToolView.subView = Qt.createQmlObject(plugin_str,leftToolView, "dynamicPluginHub");
             }
 
             delegate: Button {
-                width: 60; height: 20
+                width: 60; height: toolCategory.height
                 text: name
                 id: categoryButton
+
 
                 style: ButtonStyle {
                     background: Rectangle {
@@ -112,14 +99,64 @@ YubaWindow {
     }
 
     Rectangle{
-        id: leftToolView
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.topMargin: 20
-        anchors.bottom: parent.bottom
-        width: 200
-        color: '#909294'
-        property var subView
+        id: toolPanel
+        height: 60
+        color: '#808080'
+        width: parent.width
+        anchors.top: toolCategory.bottom
+        ListView{
+            id: toolPanelList
+            anchors.fill: parent
+            orientation: Qt.Horizontal
+            boundsBehavior: Flickable.StopAtBounds
+            currentIndex: -1
+            spacing: 8
+            property Component toolComponent
+            model:XmlListModel {
+                id: toolXmlModel
+                query: "/channel/tool"
+                XmlRole { name: "name"; query: "name/string()" }
+                XmlRole { name: "source"; query: "source/string()" }
+                onStatusChanged: {
+                    if(status== XmlListModel.Ready)
+                        leftToolView.source = "file:///" + appPath + toolCategoryList.module + "/"+"ToolX.qml"
+                }
+            }
+
+            onCurrentIndexChanged:{
+                leftToolView.source = "file:///" + appPath + toolCategoryList.module + "/" + toolXmlModel.get(currentIndex).source
+            }
+
+            delegate: Button {
+                width: toolPanel.height; height: toolPanel.height
+                text: name
+                id: toolButton
+
+                style: ButtonStyle {
+                    background: Rectangle {
+                        border.width: control.activeFocus ? 10 : 5
+                        gradient: toolButton.ListView.isCurrentItem ? Gradients.gd2:(toolButton.hovered?Gradients.gd1:Gradients.gd5)
+                    }
+                    label: Text {
+                        text: control.text
+                        color: "black"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment:   Text.AlignVCenter
+                    }
+
+                }
+                onClicked: {
+                    toolPanelList.currentIndex = model.index
+                }
+            }
+        }
     }
 
+    Loader{
+        id: leftToolView
+        anchors.left: parent.left
+        anchors.top: toolPanel.bottom
+        anchors.bottom: parent.bottom
+        width: 200
+    }
 }
