@@ -22,7 +22,7 @@
 
 [网格序列化](https://github.com/xiconxi/YubaMesh/blob/master/mesh_serialization.md)
 
-![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/20180603-154820.png)
+![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/scan_line.gif)
 
 
 
