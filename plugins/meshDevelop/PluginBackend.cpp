@@ -5,12 +5,25 @@
 #include "./render/GridTextureRender.h"
 #include "./render/PerFaceTexRender.h"
 
+
+#include <QTcpServer>
+#include <QTcpSocket>
+
 #define PI 3.1415926f
 PluginBackend::PluginBackend()
 {
 
 }
 
+void test(int  s) {
+    LOG(INFO) << "AAAA " << s;
+}
+
+
+QTcpServer* tcp_server;
+QTcpSocket* tcp_connections;
+
+QTcpSocket* tcp_socket;
 void PluginBackend::construction() {
     IPluginBackend::construction();
     RenderScript([&](QTime &t) mutable {
@@ -24,7 +37,25 @@ void PluginBackend::construction() {
     global::con<RenderCtrl>().pause("axes");
     global::con<RenderCtrl>().pause("box");
 
-    importMesh(MESHPATH"bunny.obj","bunny");
+    tcp_server = new QTcpServer(this);
+    tcp_server->listen(QHostAddress::Any, 6843);
+    connect(tcp_server,&QTcpServer::newConnection,[=](){
+        LOG(INFO) << "new Connection";
+        tcp_connections = tcp_server->nextPendingConnection();
+        connect(tcp_connections, &QTcpSocket::readyRead, [=](){
+            QByteArray qba = tcp_connections->readAll();
+            std::cout<< "Recv: "  << qba.toStdString() << std::endl;;
+        });
+    });
+
+    tcp_socket = new QTcpSocket(this);
+    tcp_socket->connectToHost("127.0.0.1",6843);
+    tcp_socket->write("1234567890");
+
+    void(*p)(int) = test;
+    p(1);
+
+//    importMesh(MESHPATH"bunny.obj","bunny");
 
 //    importMesh(MESHPATH"body2.obj","body2");
 
@@ -39,6 +70,9 @@ void PluginBackend::construction() {
 //        LOG(INFO) << select_file;
 //        YbMesh::IO::writePartialMesh(mesh->m_v, mesh->selectedFaces(), select_file);
 //    });
+
+
+
 }
 
 bool PluginBackend::importMesh(std::string url,std::string name){
