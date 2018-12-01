@@ -1,6 +1,6 @@
 # YubaMs (OSX)
 
-基于QtQuick/OpenGL(4.2)的插件化网格测量(目前只有软件框架和些乱七八糟的小东西):
+基于QtQuick/OpenGL(4.2)的插件化网格测量(目前只有一个面临再次重构的框架和些乱七八糟的小东西): 
 
 ![image](https://github.com/xiconxi/YubaMs/raw/master/screenshots/pick_select.gif)
 
